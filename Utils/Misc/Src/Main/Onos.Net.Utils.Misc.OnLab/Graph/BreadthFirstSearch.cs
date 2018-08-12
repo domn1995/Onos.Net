@@ -17,7 +17,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
             // Set up the starting frontier with the source as the sole vertex.
             var frontier = new HashSet<V>();
-            result.UpdateVertex(src, default, weigher.GetInitialWeight(), true);
+            result.UpdateVertex(src, default, weigher.InitialWeight, true);
             frontier.Add(src);
 
             bool reachedEnd = false;

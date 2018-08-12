@@ -21,11 +21,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// </summary>
         /// <param name="src">The source vertex.</param>
         /// <param name="dst">The destination vertex.</param>
-        protected AbstractEdge(V src, V dst)
-        {
-            Src = src;
-            Dst = dst;
-        }
+        protected AbstractEdge(V src, V dst) => (Src, Dst) = (src, dst);
 
         /// <inheritdoc/>
         public override bool Equals(object obj)

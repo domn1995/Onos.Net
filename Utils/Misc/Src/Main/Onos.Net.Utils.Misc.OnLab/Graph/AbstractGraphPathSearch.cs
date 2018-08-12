@@ -288,8 +288,18 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             }
         }
 
+        /// <summary>
+        /// The abstract implementation of this algorithm's search function.
+        /// </summary>
+        /// <param name="graph">The graph to search.</param>
+        /// <param name="src">The source vertex.</param>
+        /// <param name="dst">The destination vertex.</param>
+        /// <param name="weigher">The edge weigher.</param>
+        /// <param name="maxPaths">The maximum number of paths to find.</param>
+        /// <returns>A search result.</returns>
         protected abstract IResult<V, E> InternalSearch(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = AllPaths);
 
+        /// <inheritdoc/>
         public IResult<V, E> Search(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = -1)
         {
             CheckArguments(graph, src, dst);

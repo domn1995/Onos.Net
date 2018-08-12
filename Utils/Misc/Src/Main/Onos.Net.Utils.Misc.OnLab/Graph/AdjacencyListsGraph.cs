@@ -10,8 +10,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// <typeparam name="E">The edge type.</typeparam>
     public class AdjacencyListsGraph<V, E> : IGraph<V, E> where V : IVertex where E : IEdge<V>
     {
-        private readonly Dictionary<V, ISet<E>> sources;
-        private readonly Dictionary<V, ISet<E>> destinations;
+        private readonly Dictionary<V, ISet<E>> sources = new Dictionary<V, ISet<E>>();
+        private readonly Dictionary<V, ISet<E>> destinations = new Dictionary<V, ISet<E>>();
 
         /// <inheritdoc/>
         public ISet<V> Vertices { get; }
@@ -34,31 +34,26 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 throw new ArgumentNullException(nameof(edges));
             }
-
-            Dictionary<V, ISet<E>> srcMap = new Dictionary<V, ISet<E>>();
-            Dictionary<V, ISet<E>> dstMap = new Dictionary<V, ISet<E>>();
             HashSet<V> actualVertices = new HashSet<V>(vertices);
 
             foreach (E edge in edges)
             {
-                if (!srcMap.ContainsKey(edge.Src))
+                if (!sources.ContainsKey(edge.Src))
                 {
-                    srcMap.Add(edge.Src, new HashSet<E>());
+                    sources.Add(edge.Src, new HashSet<E>());
                 }
-                srcMap[edge.Src].Add(edge);
+                sources[edge.Src].Add(edge);
                 actualVertices.Add(edge.Src);
-                if (!srcMap.ContainsKey(edge.Dst))
+                if (!destinations.ContainsKey(edge.Dst))
                 {
-                    dstMap.Add(edge.Dst, new HashSet<E>());
+                    destinations.Add(edge.Dst, new HashSet<E>());
                 }
-                dstMap[edge.Dst].Add(edge);
+                destinations[edge.Dst].Add(edge);
                 actualVertices.Add(edge.Dst);
             }
 
             Edges = edges;
             Vertices = actualVertices;
-            sources = srcMap;
-            destinations = dstMap;
         }
 
         /// <inheritdoc/>

@@ -36,9 +36,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// </summary>
         /// <param name="data">The data for the heap.</param>
         /// <param name="comparer">The comparer for organizing heap.</param>
-        public Heap(IList<T> data, IComparer<T> comparer)
+        public Heap(IEnumerable<T> data, IComparer<T> comparer)
         {
-            this.data = data ?? throw new ArgumentNullException(nameof(data));
+            this.data = data?.ToList() ?? throw new ArgumentNullException(nameof(data));
             this.comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             Heapify();
         }

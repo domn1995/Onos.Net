@@ -39,7 +39,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             SpanningTreeResult result = new SpanningTreeResult(src, dst, maxPaths);
 
             // The source vertex has cost 0, of course.
-            result.UpdateVertex(src, default, weigher.GetInitialWeight(), true);
+            result.UpdateVertex(src, default, weigher.InitialWeight, true);
 
             // Track finished vertices and keep a stack of vertices that have
             // been started. Start this stack with the source on it.

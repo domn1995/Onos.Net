@@ -88,6 +88,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             edges.Remove(edge);
         }
 
+        /// <inheritdoc/>
         public IPath<V, E> ToImmutable() => new DefaultPath<V, E>(edges, Cost);
 
         /// <inheritdoc/>

@@ -19,13 +19,13 @@
         /// terminating in the same vertex, typically 0).
         /// </summary>
         /// <returns></returns>
-        IWeight GetInitialWeight();
+        IWeight InitialWeight { get; }
 
         /// <summary>
         /// Returns the weight of link/path that should be skipped.
         /// Can be considered as an infinite weight.
         /// </summary>
         /// <returns></returns>
-        IWeight GetNonViableWeight();
+        IWeight NonViableWeight { get; }
     }
 }

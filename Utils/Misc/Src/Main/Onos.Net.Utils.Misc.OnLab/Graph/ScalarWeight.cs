@@ -31,10 +31,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// Initializes a new <see cref="ScalarWeight"/> object with the given value.
         /// </summary>
         /// <param name="value">The weight value.</param>
-        public ScalarWeight(double value)
-        {
-            Value = value;
-        }
+        public ScalarWeight(double value) => Value = value;
 
         /// <summary>
         /// Creates a new <see cref="ScalarWeight"/> with the given value.

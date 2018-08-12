@@ -2,22 +2,33 @@
 {
     public class DefaultEdgeWeigher<V, E> : IEdgeWeigher<V, E> where V : IVertex where E : IEdge<V>
     {
+        /// <summary>
+        /// Common weight value for any link.
+        /// </summary>
         protected const double HopWeightValue = 1;
+
+        /// <summary>
+        /// Weight value for a null path (no links).
+        /// </summary>
         protected const double NullWeightValue = 0;
 
-        public IWeight GetInitialWeight()
-        {
-            throw new System.NotImplementedException();
-        }
+        /// <summary>
+        /// Gets the default weight based on hop count.
+        /// </summary>
+        public static ScalarWeight DefaultHopWeight { get; } = new ScalarWeight(HopWeightValue);
 
-        public IWeight GetNonViableWeight()
-        {
-            throw new System.NotImplementedException();
-        }
+        /// <summary>
+        /// Gets the default initial weight.
+        /// </summary>
+        public static ScalarWeight DefaultInitialWeight { get; } = new ScalarWeight(NullWeightValue);
 
-        public IWeight GetWeight(E edge)
-        {
-            throw new System.NotImplementedException();
-        }
+        /// <inheritdoc/>
+        public IWeight InitialWeight => DefaultInitialWeight;
+
+        /// <inheritdoc/>
+        public IWeight NonViableWeight => ScalarWeight.NonViableWeight;
+
+        /// <inheritdoc/>
+        public IWeight GetWeight(E edge) => DefaultHopWeight;
     }
 }

@@ -15,7 +15,7 @@
             // Prepare the graph search result.
             DefaultResult result = new DefaultResult(src, dst, maxPaths);
             // The source vertex has cost 0, of course.
-            result.UpdateVertex(src, default, weigher.GetInitialWeight(), true);
+            result.UpdateVertex(src, default, weigher.InitialWeight, true);
             int max = graph.Vertices.Count - 1;
             for (int i = 0; i < max; ++i)
             {
