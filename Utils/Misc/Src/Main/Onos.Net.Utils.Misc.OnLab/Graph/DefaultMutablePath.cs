@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -40,10 +41,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="path">The path to copy.</param>
         public DefaultMutablePath(IPath<V, E> path)
         {
-            if (path is null)
-            {
-                throw new ArgumentNullException(nameof(path));   
-            }
+            CheckNotNull(path, "The path cannot be null.");
             Cost = path.Cost;
             edges.AddRange(path.Edges);
         }
@@ -51,40 +49,28 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <inheritdoc/>
         public void AppendEdge(E edge)
         {
-            if (edge is null)
-            {
-                throw new ArgumentNullException(nameof(edge));
-            }
-            if (edges.Count == 0 || Dst == edge.Src)
-            {
-                throw new ArgumentException($"Edge source must be the same as the current path destination.");
-            }
+            CheckNotNull(edge, "The edge cannot be null.");
+            CheckArgument(edges.Count == 0 || Dst == edge.Src, 
+                "Edge source must be the same as the current path destination.");
             edges.Add(edge);
         }
 
         /// <inheritdoc/>
         public void InsertEdge(E edge)
         {
-            if (edge is null)
-            {
-                throw new ArgumentNullException(nameof(edge));
-            }
-            if (edges.Count == 0 || Src == edge.Dst)
-            {
-                throw new ArgumentException($"Edge destination must be the same as the current path source.");
-            }
+            CheckNotNull(edge, "The edge cannot be null.");
+            CheckArgument(edges.Count == 0 || Src == edge.Dst, 
+                "The destination edge must be the same as the current path source.");
             edges.Insert(0, edge);
         }
 
         /// <inheritdoc/>
         public void RemoveEdge(E edge)
         {
-            if (edge.Src == edge.Dst || 
-                edges.IndexOf(edge) == 0 || 
-                edges.LastIndexOf(edge) == edges.Count - 1)
-            {
-                throw new ArgumentException("Edge must be at the start of path, end of path, or a cyclic edge.");
-            }
+            CheckArgument(edge.Src == edge.Dst ||
+                edges.IndexOf(edge) == 0 ||
+                edges.LastIndexOf(edge) == edges.Count - 1,
+                "Edge must be at the start of path, end of path, or a cyclic edge.");
             edges.Remove(edge);
         }
 

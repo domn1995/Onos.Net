@@ -64,5 +64,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             return HasBackup ? Primary.GetHashCode() + Secondary.GetHashCode() : HashCode.Combine(Primary);
         }
+
+        public override string ToString() => $"[{GetType().Name}] Src = {Src}, Dst = {Dst}, Cost = {Cost}, Edges = {Edges}";
     }
 }

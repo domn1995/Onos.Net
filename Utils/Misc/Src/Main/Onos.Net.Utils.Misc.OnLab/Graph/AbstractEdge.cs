@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -7,7 +8,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// Base representation of a graph edge.
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
-    public abstract class AbstractEdge<V> : IEdge<V> where V : IVertex
+    public abstract class AbstractEdge<V> : IEdge<V> where V : class, IVertex
     {
         /// <inheritdoc/>
         public V Src { get; }
@@ -21,7 +22,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// </summary>
         /// <param name="src">The source vertex.</param>
         /// <param name="dst">The destination vertex.</param>
-        protected AbstractEdge(V src, V dst) => (Src, Dst) = (src, dst);
+        protected AbstractEdge(V src, V dst) => (Src, Dst) = (CheckNotNull(src), CheckNotNull(dst));
 
         /// <inheritdoc/>
         public override bool Equals(object obj)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -34,7 +35,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             public V Dst { get; }
 
             /// <inheritdoc/>
-            public ISet<IPath<V, E>> Paths { get; } = new HashSet<IPath<V, E>>();
+            public virtual ISet<IPath<V, E>> Paths { get; } = new HashSet<IPath<V, E>>();
 
             /// <inheritdoc/>
             public IDictionary<V, ISet<E>> Parents { get; } = new Dictionary<V, ISet<E>>();
@@ -50,7 +51,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// <param name="maxPaths">The maximum number of paths to find.</param>
             public DefaultResult(V src, V dst, int maxPaths = 1)
             {
-                Src = src ?? throw new ArgumentNullException(nameof(src));
+                Src = CheckNotNull(src, "The source vertex cannot be null.");
                 Dst = dst;
                 MaxPaths = maxPaths;
             }
@@ -269,23 +270,11 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="dst">An optional target vertex; must belong to the graph.</param>
         protected void CheckArguments(IGraph<V, E> graph, V src, V dst)
         {
-            if (graph is null)
-            {
-                throw new ArgumentNullException(nameof(graph));
-            }
-            if (src is null)
-            {
-                throw new ArgumentNullException(nameof(src));
-            }
+            CheckNotNull(graph, "The graph cannot be null.");
+            CheckNotNull(src, "The source vertex cannot be null.");
             var vertices = graph.Vertices;
-            if (!vertices.Contains(src))
-            {
-                throw new ArgumentException("Source is not in the graph.");
-            }
-            if (dst != null && !vertices.Contains(dst))
-            {
-                throw new ArgumentException("Destination is not in the graph.");
-            }
+            CheckArgument(vertices.Contains(src), "Source is not in the graph.");
+            CheckArgument(dst is null || vertices.Contains(dst), "Destination is not in the graph.");
         }
 
         /// <summary>

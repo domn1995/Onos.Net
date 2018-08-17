@@ -5,6 +5,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// <summary>
     /// Weight implementation based on a double value.
     /// </summary>
+    /// TODO: Implement operator+ and operator- overloading.
     public class ScalarWeight : IWeight
     {
         /// <summary>

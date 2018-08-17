@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -26,14 +27,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="edges">The set of graph edges.</param>
         public AdjacencyListsGraph(ISet<V> vertices, ISet<E> edges)
         {
-            if (vertices is null)
-            {
-                throw new ArgumentNullException(nameof(vertices));
-            }
-            if (edges is null)
-            {
-                throw new ArgumentNullException(nameof(edges));
-            }
+            CheckNotNull(vertices, "Vertices cannot be null.");
+            CheckNotNull(edges, "Edges cannot be null.");
             HashSet<V> actualVertices = new HashSet<V>(vertices);
 
             foreach (E edge in edges)
