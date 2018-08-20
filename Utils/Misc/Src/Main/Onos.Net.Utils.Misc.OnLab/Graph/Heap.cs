@@ -11,6 +11,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// TODO: Make thread-safe.
+    /// TODO: Add where T : IComparable{T}?
     public class Heap<T> : IEnumerable<T>
     {
         private readonly IList<T> data;
@@ -19,7 +20,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <summary>
         /// Returns the most extreme item in the heap or null if empty.
         /// </summary>
-        public T Extreme => data.Count == 0 ? default : data[0];
+        /// <exception cref="InvalidOperationException">Heap is empty.</exception>
+        public T Extreme => data.Count == 0 ? throw new InvalidOperationException("Heap is empty.") : data[0];
 
         /// <summary>
         /// Returns true if there are no items in the heap.
@@ -50,6 +52,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// Removes and returns the most extremem item from the heap.
         /// </summary>
         /// <returns>The heap extreme or default if empty.</returns>
+        /// <exception cref="InvalidOperationException">Heap is empty.</exception>
         public T ExtractExtreme()
         {
             if (!IsEmpty)
@@ -60,7 +63,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 Heapify();
                 return extreme;
             }
-            return default;
+            throw new InvalidOperationException("Heap is empty.");
         }
 
         /// <summary>

@@ -62,7 +62,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             if (obj is ScalarWeight sw)
             {
-                return Math.Abs(sw.Value - Value) < SamenessTreshold;
+                return Equals(sw);
             }
             return false;
         }
@@ -75,5 +75,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
         /// <inheritdoc/>
         public override string ToString() => $"[{GetType().Name}] Value = {Value}";
+
+        /// <inheritdoc/>
+        public bool Equals(IWeight other) => Math.Abs(other.Value - Value) < SamenessTreshold;
     }
 }

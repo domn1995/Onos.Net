@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Onos.Net.Utils.Misc.OnLab.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
@@ -11,8 +13,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// <typeparam name="E">The edge type.</typeparam>
     public class AdjacencyListsGraph<V, E> : IGraph<V, E> where V : IVertex where E : IEdge<V>
     {
-        private readonly Dictionary<V, ISet<E>> sources = new Dictionary<V, ISet<E>>();
-        private readonly Dictionary<V, ISet<E>> destinations = new Dictionary<V, ISet<E>>();
+        private readonly IDictionary<V, ISet<E>> sources = new Dictionary<V, ISet<E>>();
+        private readonly IDictionary<V, ISet<E>> destinations = new Dictionary<V, ISet<E>>();
 
         /// <inheritdoc/>
         public ISet<V> Vertices { get; }
@@ -52,10 +54,10 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         }
 
         /// <inheritdoc/>
-        public ISet<E> GetEdgesFrom(V src) => sources[src];
+        public ISet<E> GetEdgesFrom(V src) => sources.GetOrDefault(src, new HashSet<E>());
 
         /// <inheritdoc/>
-        public ISet<E> GetEdgesTo(V dst) => destinations[dst];
+        public ISet<E> GetEdgesTo(V dst) => destinations.GetOrDefault(dst, new HashSet<E>());
 
         /// <inheritdoc/>
         public override bool Equals(object obj)

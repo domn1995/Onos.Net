@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Onos.Net.Utils.Misc.OnLab.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
@@ -29,19 +30,19 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             protected int MaxPaths { get; }
 
             /// <inheritdoc/>
-            public V Src { get; }
+            public virtual V Src { get; }
 
             /// <inheritdoc/>
-            public V Dst { get; }
+            public virtual V Dst { get; }
 
             /// <inheritdoc/>
             public virtual ISet<IPath<V, E>> Paths { get; } = new HashSet<IPath<V, E>>();
 
             /// <inheritdoc/>
-            public IDictionary<V, ISet<E>> Parents { get; } = new Dictionary<V, ISet<E>>();
+            public virtual IDictionary<V, ISet<E>> Parents { get; } = new Dictionary<V, ISet<E>>();
 
             /// <inheritdoc/>
-            public IDictionary<V, IWeight> Costs { get; } = new Dictionary<V, IWeight>();
+            public virtual IDictionary<V, IWeight> Costs { get; } = new Dictionary<V, IWeight>();
 
             /// <summary>
             /// Initializes a new <see cref="DefaultResult"/> class with the given values.
@@ -70,7 +71,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// </summary>
             /// <param name="v">The vertex to search.</param>
             /// <returns>The weight cost to reach the vertex if already accessed, otherwise null.</returns>
-            public IWeight GetCost(V v) => Costs[v];
+            public IWeight GetCost(V v) => Costs.GetOrDefault(v);
 
             /// <summary>
             /// Updates the cost of the vertex using its existing cost plus the 
@@ -84,10 +85,11 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// False to indicate that the edge should be added to the previously accrued edges as they yield the same cost.</param>
             public void UpdateVertex(V vertex, E edge, IWeight cost, bool replace)
             {
-                Costs.Add(vertex, cost);
+                Costs.SetOrAdd(vertex, cost);
+                
                 if (edge != null)
                 {
-                    ISet<E> edges = Parents[vertex];
+                    ISet<E> edges = Parents.GetOrDefault(vertex);
                     if (edges == null)
                     {
                         edges = new HashSet<E>();

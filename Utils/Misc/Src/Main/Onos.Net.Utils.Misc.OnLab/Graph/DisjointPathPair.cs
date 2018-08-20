@@ -39,6 +39,11 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         public bool HasBackup => Secondary != null;
 
         /// <summary>
+        /// Gets the number of paths inside this path pair object.
+        /// </summary>
+        public int Size => HasBackup ? 2 : 1;
+
+        /// <summary>
         /// Initializes a new <see cref="DijkstraGraphSearch{V, E}"/> instance with the given paths.
         /// </summary>
         /// <param name="primary">The primary path.</param>
@@ -65,6 +70,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             return HasBackup ? Primary.GetHashCode() + Secondary.GetHashCode() : HashCode.Combine(Primary);
         }
 
+        /// <inheritdoc/>
         public override string ToString() => $"[{GetType().Name}] Src = {Src}, Dst = {Dst}, Cost = {Cost}, Edges = {Edges}";
     }
 }

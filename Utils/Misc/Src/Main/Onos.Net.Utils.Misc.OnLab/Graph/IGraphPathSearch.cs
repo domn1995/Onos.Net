@@ -5,7 +5,7 @@
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
     /// <typeparam name="E">The edge type.</typeparam>
-    public interface IGraphPathSearch<V, E> where V : IVertex where E : IEdge<V>
+    public interface IGraphPathSearch<V, E> where V : class, IVertex where E : class, IEdge<V>
     {
         /// <summary>
         /// Searches the specified graph for paths between vertices.
