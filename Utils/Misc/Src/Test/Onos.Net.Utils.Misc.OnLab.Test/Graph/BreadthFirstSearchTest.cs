@@ -10,13 +10,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         protected override AbstractGraphPathSearch<TestVertex, TestEdge> GraphSearch => new BreadthFirstSearch<TestVertex, TestEdge>();
 
         [Fact]
-        public void DefaultGraphTest()
+        public virtual void DefaultGraphTest()
         {
             ExecuteDefaultTest(7, 3, new TestDoubleWeight(8.0));
         }
 
         [Fact]
-        public void DefaultHopCountWeight()
+        public virtual void DefaultHopCountWeight()
         {
             Weigher = null;
             ExecuteDefaultTest(7, 3, new ScalarWeight(3.0));

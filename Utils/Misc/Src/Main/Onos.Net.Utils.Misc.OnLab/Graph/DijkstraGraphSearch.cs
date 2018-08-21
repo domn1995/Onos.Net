@@ -35,7 +35,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 // Get the nearest vertex.
                 V nearest = minQueue.ExtractExtreme();
-                if (nearest == dst)
+                if (nearest.Equals(dst))
                 {
                     break;
                 }

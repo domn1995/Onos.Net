@@ -216,8 +216,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                         // If we have not reached the beginning, i.e. the source, fetch the 
                         // set of edges leading to the first vertex of this pending path.
                         // If there are none, abandon processing this path for good.
-                        var firstVertexParents = result.Parents[firstVertex];
-                        if (firstVertex is null || firstVertexParents.Count == 0)
+                        var firstVertexParents = result.Parents.GetOrDefault(firstVertex, new HashSet<E>());
+                        if (firstVertex is null || firstVertexParents?.Count == 0)
                         {
                             break;
                         }
@@ -294,7 +294,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         public IResult<V, E> Search(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = -1)
         {
             CheckArguments(graph, src, dst);
-            return InternalSearch(graph, src, dst, weigher ?? new DefaultEdgeWeigher<V, E>());
+            return InternalSearch(graph, src, dst, weigher ?? new DefaultEdgeWeigher<V, E>(), maxPaths);
         }
     }
 }

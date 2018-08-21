@@ -10,8 +10,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
     {
         protected abstract AbstractGraphPathSearch<TestVertex, TestEdge> GraphSearch { get; }
 
-        protected ISet<TestVertex> Set1 => new HashSet<TestVertex>() { B, C }.ToImmutableHashSet();
-        protected ISet<TestEdge> Set2 => new HashSet<TestEdge>() { new TestEdge(B, C) }.ToImmutableHashSet();
+        private ISet<TestVertex> Set1 => new HashSet<TestVertex>() { B, C }.ToImmutableHashSet();
+        private ISet<TestEdge> Set2 => new HashSet<TestEdge>() { new TestEdge(B, C) }.ToImmutableHashSet();
 
         [Fact]
         public void NoSuchSourceArgument()

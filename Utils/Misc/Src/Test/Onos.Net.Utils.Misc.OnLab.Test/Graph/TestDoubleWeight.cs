@@ -23,7 +23,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
         public bool IsViable => !Equals(NonViableWeight);
 
-        public bool IsNegative => throw new System.NotImplementedException();
+        public bool IsNegative => Value < 0;
 
         /// <summary>
         /// Initializes a new <see cref="TestDoubleWeight"/> instance with the given value.
