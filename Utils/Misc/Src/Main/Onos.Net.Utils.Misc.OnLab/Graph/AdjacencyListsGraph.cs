@@ -11,7 +11,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
     /// <typeparam name="E">The edge type.</typeparam>
-    public class AdjacencyListsGraph<V, E> : IGraph<V, E> where V : IVertex where E : IEdge<V>
+    public class AdjacencyListsGraph<V, E> : IEquatable<AdjacencyListsGraph<V,E>>, 
+        IGraph<V, E> where V : IVertex where E : IEdge<V>
     {
         private readonly IDictionary<V, ISet<E>> sources = new Dictionary<V, ISet<E>>();
         private readonly IDictionary<V, ISet<E>> destinations = new Dictionary<V, ISet<E>>();
@@ -62,10 +63,28 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            var graph = obj as AdjacencyListsGraph<V, E>;
-            return graph != null &&
-                   EqualityComparer<ISet<V>>.Default.Equals(Vertices, graph.Vertices) &&
-                   EqualityComparer<ISet<E>>.Default.Equals(Edges, graph.Edges);
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is AdjacencyListsGraph<V, E> graph ? IsEqual(graph) : false;
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(AdjacencyListsGraph<V, E> other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return IsEqual(other);
+        }
+
+        /// <summary>
+        /// Determines value equality.
+        /// </summary>
+        /// <param name="other">The other graph to compare against.</param>
+        /// <returns>True if values are equal, otherwise false.</returns>
+        protected virtual bool IsEqual(AdjacencyListsGraph<V, E> other)
+        {
+            return Vertices.SequenceEqual(other.Vertices) &&
+                Edges.SequenceEqual(other.Edges);
         }
 
         /// <inheritdoc/>
@@ -73,5 +92,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
         /// <inheritdoc/>
         public override string ToString() => $"[{GetType().Name}] Vertices = {Vertices}, Edges = {Edges}";
+
+        
     }
 }
