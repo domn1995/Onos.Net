@@ -6,7 +6,7 @@ using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
-    public class DefaultPath<V, E> : IPath<V, E> where V : IVertex where E : IEdge<V>
+    public class DefaultPath<V, E> : IEquatable<DefaultPath<V, E>>, IPath<V, E> where V : class, IVertex where E : class, IEdge<V>
     {
         private readonly IList<E> edges;
 
@@ -45,12 +45,32 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            var path = obj as DefaultPath<V, E>;
-            return path != null &&
-                   EqualityComparer<IList<E>>.Default.Equals(edges, path.edges) &&
-                   EqualityComparer<IWeight>.Default.Equals(Cost, path.Cost) &&
-                   EqualityComparer<V>.Default.Equals(Src, path.Src) &&
-                   EqualityComparer<V>.Default.Equals(Dst, path.Dst);
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is DefaultPath<V, E> path ? IsEqual(path) : false;
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(DefaultPath<V, E> other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return IsEqual(other);
+        }
+
+        /// <summary>
+        /// Determines value equality.
+        /// </summary>
+        /// <param name="other">The other object to compare against.</param>
+        /// <returns>True if the objects are equal.</returns>
+        protected virtual bool IsEqual(DefaultPath<V, E> other)
+        {
+            return Src.Equals(other.Src) &&
+                   Dst.Equals(other.Dst) &&
+                   // TODO: This is clunky, is there a better way?
+                   other.Cost is null ? Cost is null 
+                      : Cost.Equals(other.Cost)  &&
+                   Edges.SequenceEqual(other.Edges);
         }
 
         /// <inheritdoc/>

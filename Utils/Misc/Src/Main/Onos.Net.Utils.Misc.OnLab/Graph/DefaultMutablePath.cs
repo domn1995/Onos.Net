@@ -11,7 +11,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
     /// <typeparam name="E">The edge type.</typeparam>
-    public class DefaultMutablePath<V, E> : IMutablePath<V, E> where V : class, IVertex where E : class, IEdge<V>
+    public class DefaultMutablePath<V, E> : IEquatable<DefaultMutablePath<V, E>>, IMutablePath<V, E> where V : class, IVertex where E : class, IEdge<V>
     {
         private readonly List<E> edges = new List<E>();
 
@@ -80,10 +80,31 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            var path = obj as DefaultMutablePath<V, E>;
-            return path != null &&
-                   EqualityComparer<List<E>>.Default.Equals(edges, path.edges) &&
-                   EqualityComparer<IWeight>.Default.Equals(Cost, path.Cost);
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is DefaultMutablePath<V, E> other ? IsEqual(other) : false;
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(DefaultMutablePath<V, E> other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return IsEqual(other);
+        }
+
+        /// <summary>
+        /// Determines value equality.
+        /// </summary>
+        /// <param name="other">The other object to compare against.</param>
+        /// <returns>True if the objects are equal.</returns>
+        /// TODO: Should this be virtual?
+        protected virtual bool IsEqual(DefaultMutablePath<V, E> other)
+        {
+            return Src.Equals(other.Src) &&
+                   Dst.Equals(other.Dst) &&
+                   Cost.Equals(other.Cost) &&
+                   Edges.SequenceEqual(other.Edges);
         }
 
         /// <inheritdoc/>

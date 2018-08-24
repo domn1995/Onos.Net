@@ -54,7 +54,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="other">The other object to compare against.</param>
         /// <returns>True if the objects are equal.</returns>
         /// TODO: Should this be virtual?
-        protected bool IsEqual(AbstractEdge<V> other) => Src.Equals(other.Src) && Dst.Equals(other.Dst);
+        protected virtual bool IsEqual(AbstractEdge<V> other) => Src.Equals(other.Src) && Dst.Equals(other.Dst);
 
         /// <inheritdoc/>
         public override int GetHashCode()

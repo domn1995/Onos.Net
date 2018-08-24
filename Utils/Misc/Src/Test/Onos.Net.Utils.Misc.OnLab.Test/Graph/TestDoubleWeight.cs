@@ -58,7 +58,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             return IsEqual(other);
         }
 
-        private bool IsEqual(TestDoubleWeight other) => Value.FuzzyEquals(other.Value, 0.1);
+        protected virtual bool IsEqual(TestDoubleWeight other) => Value.FuzzyEquals(other.Value, 0.1);
 
         public override int GetHashCode() => Value.GetHashCode();
 

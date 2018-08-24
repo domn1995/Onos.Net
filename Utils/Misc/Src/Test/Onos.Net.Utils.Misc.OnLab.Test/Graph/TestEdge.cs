@@ -54,7 +54,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test
             return IsEqual(other);
         }
 
-        private bool IsEqual(TestEdge other) => base.Equals(other) && Weight == other.Weight;
+        protected virtual bool IsEqual(TestEdge other) => base.Equals(other) && Weight == other.Weight;
 
         public override int GetHashCode() => 31 ^ base.GetHashCode() + HashCode.Combine(Weight);
 
