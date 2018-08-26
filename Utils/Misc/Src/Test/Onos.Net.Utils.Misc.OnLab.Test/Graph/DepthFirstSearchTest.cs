@@ -10,6 +10,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
     using TestAdjacencyListsGraph = AdjacencyListsGraph<TestVertex, TestEdge>;
     using static DepthFirstSearch<TestVertex, TestEdge>;
 
+    /// <summary>
+    /// Tests the DFS algorithm.
+    /// </summary>
     public class DepthFirstSearchTest : AbstractGraphPathSearchTest
     {
         protected override TestAbstractGraphPathSearch GraphSearch => new DepthFirstSearch<TestVertex, TestEdge>();

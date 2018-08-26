@@ -9,6 +9,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
     using TestAdjacencyListsGraph = AdjacencyListsGraph<TestVertex, TestEdge>;
     using TestKShortestPathsSearch = KShortestPathsSearch<TestVertex, TestEdge>;
 
+    /// <summary>
+    /// Tests the K-Shortest paths search algorithm.
+    /// </summary>
     public class KShortestPathsSearchTest : GraphTest
     {
         private TestKShortestPathsSearch NewSearch => new TestKShortestPathsSearch();
