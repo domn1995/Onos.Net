@@ -14,6 +14,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         private TestKShortestPathsSearch NewSearch => new TestKShortestPathsSearch();
         private TestAdjacencyListsGraph NewGraph => new TestAdjacencyListsGraph(Vertices, Edges);
 
+        /// <summary>
+        /// Tests that no paths are found between disconnected vertices.
+        /// </summary>
         [Fact]
         public void NoPath()
         {
@@ -32,6 +35,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             Assert.True(resultPathSet.Count == 0);
         }
 
+        /// <summary>
+        /// Tests a single path is found when it is the only path between vertices.
+        /// </summary>
         [Fact]
         public void SinglePath()
         {
@@ -44,6 +50,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             Assert.True(correctEdgeList.SequenceEqual(result.Paths.First().Edges));
         }
 
+        /// <summary>
+        /// Ensures that the found paths are in the correct order.
+        /// </summary>
         [Fact]
         public void ResultsAreOnlyOneHopPathPlusLongerOnes()
         {
@@ -58,6 +67,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             Assert.Equal(4, paths[2].Edges.Count);
         }
 
+        /// <summary>
+        /// Tests that there are only two paths between A and C and that they are returned in the correct order.
+        /// </summary>
         [Fact]
         public void TwoPath()
         {
@@ -75,6 +87,10 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             Assert.True(paths[1].Edges.SequenceEqual(correctEdgeList));
         }
 
+        /// <summary>
+        /// Tests that there are only four paths between A and E and that they are returned in the correct order.
+        /// Also tests the special case where some correct solutions are equal.
+        /// </summary>
         [Fact]
         public void FourPath()
         {
@@ -122,6 +138,10 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             Assert.True(paths[3].Edges.SequenceEqual(correctEdgeList));
         }
 
+        /// <summary>
+        /// H is a sink in this topology.
+        /// Ensure there are no paths from it to any other locations.
+        /// </summary>
         [Fact]
         public void PathsFromSink()
         {
@@ -131,6 +151,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             }
         }
 
+        /// <summary>
+        /// Tests that no more than K paths are returned.
+        /// </summary>
         [Fact]
         public void LimitPathSetSize()
         {
@@ -140,6 +163,19 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             Assert.Equal(1, result.Paths.Count);
         }
 
+        /// <summary>
+        /// Tests that there are only two paths between A and G 
+        /// and that they are returned in the correct order.
+        /// </summary>
+        /// <remarks>
+        ///       +-+-+  +---+ +---+  +-+-+
+        ///   +--+ B +--+ C +-+ D +--+ E |
+        ///   |  +-+-+  +---+ +---+  +-+-+
+        ///   |    |                   |
+        /// +-+-+  |    +---+ +---+  +-+-+
+        /// | A |  +----+ F +-+ G +--+ H |
+        /// +---+       +---+ +---+  +---+
+        /// </remarks>
         [Fact]
         public void VariableLenPathsWithConstantLinkWeight()
         {
