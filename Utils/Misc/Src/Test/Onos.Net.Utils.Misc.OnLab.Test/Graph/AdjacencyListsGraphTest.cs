@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 {
+    using TestAdjacencyListsGraph = AdjacencyListsGraph<TestVertex, TestEdge>;
     public class AdjacencyListsGraphTest
     {
         private static readonly TestVertex A = new TestVertex("A");
@@ -30,9 +31,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             var vertices = new HashSet<TestVertex>() { A, B, C, D, E, F }.ToImmutableHashSet();
             var vertices2 = new HashSet<TestVertex>() { A, B, C, D, E, F, G }.ToImmutableHashSet();
 
-            var graph = new AdjacencyListsGraph<TestVertex, TestEdge>(vertices, edges);
-            var same = new AdjacencyListsGraph<TestVertex, TestEdge>(vertices, edges);
-            var different = new AdjacencyListsGraph<TestVertex, TestEdge>(vertices2, edges);
+            var graph = new TestAdjacencyListsGraph(vertices, edges);
+            var same = new TestAdjacencyListsGraph(vertices, edges);
+            var different = new TestAdjacencyListsGraph(vertices2, edges);
 
             Assert.Equal(graph, same);
             Assert.NotEqual(graph, different);
@@ -42,7 +43,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         public void Basics()
         {
             var vertices = new HashSet<TestVertex>() { A, B, C, D, E, F }.ToImmutableHashSet();
-            var graph = new AdjacencyListsGraph<TestVertex, TestEdge>(vertices, edges);
+            var graph = new TestAdjacencyListsGraph(vertices, edges);
             Assert.Equal(6, graph.Vertices.Count);
             Assert.Equal(5, graph.Edges.Count);
 

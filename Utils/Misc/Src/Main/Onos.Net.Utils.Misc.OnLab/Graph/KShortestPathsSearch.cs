@@ -32,7 +32,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             var resultPaths = new List<IPath<V, E>>(maxPaths);
             var potentialPaths = new List<IPath<V, E>>();
             var dijkstraSearch = new DijkstraGraphSearch<V, E>();
-            ISet<IPath<V, E>> dijkstraResults = dijkstraSearch.Search(originalGraph, src, dst, modifiedWeigher, 1).Paths;
+            var dijkstraResults = dijkstraSearch.Search(originalGraph, src, dst, modifiedWeigher, 1).Paths;
 
             // Checks if the destination was reachable.
             if (dijkstraResults.Count == 0)
@@ -53,7 +53,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
                     foreach (var path in resultPaths)
                     {
-                        if (path.Edges.Count >= i && EdgeListsAreEqual(rootPathEdgeList, path.Edges.Take(i).ToList()))
+                        if (path.Edges.Count >= i && rootPathEdgeList.SequenceEqual(path.Edges.Take(i)))
                         {
                             modifiedWeigher.RemovedEdges.Add(path.Edges[i]);
                         }
@@ -104,32 +104,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             resultPaths.ForEach(p => result.PathSet.Add(p));
 
             return result;
-        }
-
-        /// <summary>
-        /// Determines whether two edge lists are equal.
-        /// </summary>
-        /// <param name="edgeListOne">The first edge list to compare.</param>
-        /// <param name="edgeListTwo">The second edge list to compare.</param>
-        /// <returns>True if both edge lists contain the same edges.</returns>
-        private static bool EdgeListsAreEqual(IList<E> edgeListOne, IList<E> edgeListTwo)
-        {
-            if (edgeListOne.Count != edgeListTwo.Count)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < edgeListOne.Count; ++i)
-            {
-                E edgeOne = edgeListOne[i];
-                E edgeTwo = edgeListTwo[i];
-                if (edgeOne != edgeTwo)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -188,7 +162,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// <summary>
             /// Gets an immutable set of paths for this result.
             /// </summary>
-            public override ISet<IPath<V, E>> Paths => ImmutableHashSet.CreateRange(PathSet);
+            public override ISet<IPath<V, E>> Paths => PathSet.ToImmutableSortedSet(new InnerPathComparer());
 
             /// <summary>
             /// Initializes a new <see cref="InnerOrderedResult"/> instance with the given values.
@@ -215,7 +189,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 {
                     return comparisonValue;
                 }
-                else if (EdgeListsAreEqual(pathOne.Edges, pathTwo.Edges))
+                else if (pathOne.Edges.SequenceEqual(pathTwo.Edges))
                 {
                     return 0;
                 }

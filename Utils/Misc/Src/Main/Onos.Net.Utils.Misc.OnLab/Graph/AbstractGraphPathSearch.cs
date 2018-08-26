@@ -22,7 +22,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <summary>
         /// Represents a path search result that uses <see cref="DefaultPath{V, E}"/> to convey the graph paths.
         /// </summary>
-        protected class DefaultResult : IResult<V, E>
+        public class DefaultResult : IResult<V, E>
         {
             /// <summary>
             /// Gets the max number of paths to find.

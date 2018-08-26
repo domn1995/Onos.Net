@@ -5,9 +5,12 @@ using Xunit;
 
 namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 {
+    using TestAbstractGraphPathSearch = AbstractGraphPathSearch<TestVertex, TestEdge>;
+    using TestAdjacencyListsGraph = AdjacencyListsGraph<TestVertex, TestEdge>;
+
     public class BreadthFirstSearchTest : AbstractGraphPathSearchTest
     {
-        protected override AbstractGraphPathSearch<TestVertex, TestEdge> GraphSearch => new BreadthFirstSearch<TestVertex, TestEdge>();
+        protected override TestAbstractGraphPathSearch GraphSearch => new BreadthFirstSearch<TestVertex, TestEdge>();
 
         [Fact]
         public virtual void DefaultGraphTest()
@@ -24,16 +27,16 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
         protected void ExecuteDefaultTest(int pathCount, int pathLength, IWeight pathCost)
         {
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(Vertices, Edges);
+            Graph = new TestAdjacencyListsGraph(Vertices, Edges);
             IGraphPathSearch<TestVertex, TestEdge> search = GraphSearch;
-            var paths = search.Search(Graph, A, H, Weigher, AbstractGraphPathSearch<TestVertex, TestEdge>.AllPaths).Paths;
+            var paths = search.Search(Graph, A, H, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
             Assert.Equal(1, paths.Count);
             var p = paths.First();
             Assert.Equal(A, p.Src);
             Assert.Equal(H, p.Dst);
             Assert.Equal(pathLength, p.Edges.Count);
             Assert.Equal(pathCost, p.Cost);
-            paths = search.Search(Graph, A, null, Weigher, AbstractGraphPathSearch<TestVertex, TestEdge>.AllPaths).Paths;
+            paths = search.Search(Graph, A, null, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
             PrintPaths(paths);
             Assert.Equal(pathCount, paths.Count);
         }
@@ -42,7 +45,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             IGraph<TestVertex, TestEdge> graph, TestVertex src, TestVertex dst,
             IEdgeWeigher<TestVertex, TestEdge> weigher, int pathCount, IWeight pathCost)
         {
-            var result = search.Search(graph, src, dst, weigher, AbstractGraphPathSearch<TestVertex, TestEdge>.AllPaths);
+            var result = search.Search(graph, src, dst, weigher, TestAbstractGraphPathSearch.AllPaths);
             var paths = result.Paths;
             PrintPaths(paths);
             Assert.Equal(pathCount, paths.Count);

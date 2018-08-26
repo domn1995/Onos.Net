@@ -6,6 +6,8 @@ using Xunit;
 
 namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 {
+    using TestAdjacencyListsGraph = AdjacencyListsGraph<TestVertex, TestEdge>;
+
     public abstract class AbstractGraphPathSearchTest : GraphTest
     {
         protected abstract AbstractGraphPathSearch<TestVertex, TestEdge> GraphSearch { get; }
@@ -20,7 +22,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
             void Do()
             {
-                var graph = new AdjacencyListsGraph<TestVertex, TestEdge>(Set1, Set2);
+                var graph = new TestAdjacencyListsGraph(Set1, Set2);
                 GraphSearch.Search(graph, A, H, Weigher, 1);
             }
         }
@@ -32,7 +34,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
             void Do()
             {
-                var graph = new AdjacencyListsGraph<TestVertex, TestEdge>(Set1, Set2);
+                var graph = new TestAdjacencyListsGraph(Set1, Set2);
                 GraphSearch.Search(null, A, H, Weigher, 1);
             }
         }
@@ -44,7 +46,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
             void Do()
             {
-                var graph = new AdjacencyListsGraph<TestVertex, TestEdge>(Set1, Set2);
+                var graph = new TestAdjacencyListsGraph(Set1, Set2);
                 GraphSearch.Search(graph, null, H, Weigher, 1);
             }
         }        

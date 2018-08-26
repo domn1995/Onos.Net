@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Onos.Net.Utils.Misc.OnLab.Helpers;
+using System.Collections.Generic;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -122,7 +123,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             V target = edge.Src;
             V vertex = edge.Dst;
             ISet<E> parentEdges;
-            while ((parentEdges = result.Parents[vertex]) != null)
+            while ((parentEdges = result.Parents.GetOrDefault(vertex)) != null)
             {
                 foreach (E parentEdge in parentEdges)
                 {
@@ -139,7 +140,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <summary>
         /// Graph search result which includes edge classification for building a spanning tree.
         /// </summary>
-        protected class SpanningTreeResult : DefaultResult
+        public class SpanningTreeResult : DefaultResult
         {
             /// <summary>
             /// Returns the map of edge types.

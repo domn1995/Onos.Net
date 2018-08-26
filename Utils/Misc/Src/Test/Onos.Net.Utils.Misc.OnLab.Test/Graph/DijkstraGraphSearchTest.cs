@@ -8,10 +8,12 @@ using Xunit;
 
 namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 {
+    using TestAbstractGraphPathSearch = AbstractGraphPathSearch<TestVertex, TestEdge>;
+    using TestAdjacencyListsGraph = AdjacencyListsGraph<TestVertex, TestEdge>;
+
     public class DijkstraGraphSearchTest : BreadthFirstSearchTest
     {
-        protected override AbstractGraphPathSearch<TestVertex, TestEdge> GraphSearch 
-            => new DijkstraGraphSearch<TestVertex, TestEdge>();
+        protected override TestAbstractGraphPathSearch GraphSearch => new DijkstraGraphSearch<TestVertex, TestEdge>();
 
         [Fact]
         public override void DefaultGraphTest() => ExecuteDefaultTest(7, 5, new TestDoubleWeight(5.0));
@@ -35,7 +37,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(D, C, W1),
             }.ToImmutableHashSet();
 
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(set1, set2);
+            Graph = new TestAdjacencyListsGraph(set1, set2);
             var gs = GraphSearch;
             var paths = gs.Search(Graph, A, B, Weigher, 1).Paths;
             PrintPaths(paths);
@@ -64,9 +66,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(A, C, NW1),
                 new TestEdge(C, D, W3),
             }.ToImmutableHashSet();
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(set1, set2);
+            Graph = new TestAdjacencyListsGraph(set1, set2);
             var gs = GraphSearch;
-            var paths = gs.Search(Graph, A, D, Weigher, AbstractGraphPathSearch<TestVertex, TestEdge>.AllPaths).Paths;
+            var paths = gs.Search(Graph, A, D, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
             PrintPaths(paths);
             Assert.Equal(0, paths.Count);
 
@@ -80,7 +82,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void NoEdges()
         {
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(Vertices, new HashSet<TestEdge>());
+            Graph = new TestAdjacencyListsGraph(Vertices, new HashSet<TestEdge>());
             foreach (TestVertex v in Vertices)
             {
                 ExecuteSearch(GraphSearch, Graph, v, null, Weigher, 0, new TestDoubleWeight(0));
@@ -102,7 +104,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(E, F, NW1),
                 new TestEdge(F, B, ZW),
             }.ToImmutableHashSet();
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(set1, set2);
+            Graph = new TestAdjacencyListsGraph(set1, set2);
             ExecuteSearch(GraphSearch, Graph, A, D, Weigher, 2, W2);
             ExecuteSinglePathSearch(GraphSearch, Graph, A, D, Weigher, 1, W2);
             ExecuteSearch(GraphSearch, Graph, A, B, Weigher, 1, W1);
@@ -122,7 +124,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(E, D, new TestDoubleWeight(1.7)),
                 new TestEdge(A, D, new TestDoubleWeight(5.0)),
             }.ToImmutableHashSet();
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(set1, set2);
+            Graph = new TestAdjacencyListsGraph(set1, set2);
             ExecuteSearch(GraphSearch, Graph, A, D, Weigher, 3, new TestDoubleWeight(5.0));
             ExecuteSinglePathSearch(GraphSearch, Graph, A, D, Weigher, 1, W5);
         }
@@ -143,7 +145,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(F, G, W1),
                 new TestEdge(A, G, W4),
             }.ToImmutableHashSet();
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(set1, set2);
+            Graph = new TestAdjacencyListsGraph(set1, set2);
             ExecuteSearch(GraphSearch, Graph, A, G, Weigher, 5, W4);
             ExecuteSinglePathSearch(GraphSearch, Graph, A, G, Weigher, 1, W4);
         }
@@ -169,13 +171,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(A, E, W3),
                 new TestEdge(B, D, W1),
             }.ToImmutableHashSet();
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(set1, set2);
+            Graph = new TestAdjacencyListsGraph(set1, set2);
             ExecuteSearch(GraphSearch, Graph, A, E, Weigher, 3, W3);
             ExecuteSinglePathSearch(GraphSearch, Graph, A, E, Weigher, 1, W3);
 
             var gs = GraphSearch;
-            var pathF = gs.Search(Graph, A, F, Weigher, AbstractGraphPathSearch<TestVertex, TestEdge>.AllPaths).Paths;
-            var pathE = gs.Search(Graph, A, E, Weigher, AbstractGraphPathSearch<TestVertex, TestEdge>.AllPaths).Paths;
+            var pathF = gs.Search(Graph, A, F, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
+            var pathE = gs.Search(Graph, A, E, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
             Assert.Equal(0, pathF.Count - pathE.Count);
             Assert.Equal(new TestDoubleWeight(1.0), pathF.First().Cost.Subtract(pathE.First().Cost));
         }
@@ -198,7 +200,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(G, A, NW5),
                 new TestEdge(A, G, W4),
             }.ToImmutableHashSet();
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(set1, set2);
+            Graph = new TestAdjacencyListsGraph(set1, set2);
             ExecuteSearch(GraphSearch, Graph, A, G, Weigher, 3, new TestDoubleWeight(4.0));
             ExecuteSinglePathSearch(GraphSearch, Graph, A, G, Weigher, 1, new TestDoubleWeight(4.0));
         }
@@ -212,7 +214,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 vertices.Add(new TestVertex($"v{i}"));
             }
 
-            Graph = new AdjacencyListsGraph<TestVertex, TestEdge>(vertices, new HashSet<TestEdge>().ToImmutableHashSet());
+            Graph = new TestAdjacencyListsGraph(vertices, new HashSet<TestEdge>().ToImmutableHashSet());
             Stopwatch sw = Stopwatch.StartNew();
             foreach (var src in vertices)
             {
