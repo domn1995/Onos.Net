@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -55,12 +57,12 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 foreach (E edge in shortPath.Edges)
                 {
                     gt.RemoveEdge(edge);
-                    IEdge<V> reverse = new ReverseEdge(edge);
-                    revToEdge.Add((E)reverse, edge);
-                    gt.AddEdge((E)reverse);
+                    E reverse = (E)Activator.CreateInstance(typeof(E), edge.Dst, edge.Src);
+                    revToEdge.Add(reverse, edge);
+                    gt.AddEdge(reverse);
                 }
                 // Rerun dijkstra on the temporary graph to get a second path.
-                IResult<V, E> secondDijkstra = new DijkstraGraphSearch<V, E>().Search(gt, src, dst, modified, AllPaths);
+                IResult<V, E> secondDijkstra = new DijkstraGraphSearch<V, E>().Search(gt, src, dst, modified);
                 if (secondDijkstra.Paths.Count == 0)
                 {
                     result.Dpps.Add(new DisjointPathPair<V, E>(shortPath, null));
@@ -82,9 +84,12 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                     {
                         foreach (E edge in residualShortPath.Edges)
                         {
-                            if (edge is ReverseEdge)
+                            if (revToEdge.ContainsKey(edge))
                             {
-                                roundTrip.RemoveEdge(revToEdge[edge]);
+                                if (roundTrip.Edges.Contains(edge))
+                                {
+                                    roundTrip.RemoveEdge(revToEdge[edge]);
+                                }
                             }
                             else
                             {

@@ -1,6 +1,7 @@
 ﻿using Onos.Net.Utils.Misc.OnLab.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
@@ -14,8 +15,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     public class AdjacencyListsGraph<V, E> : IEquatable<AdjacencyListsGraph<V,E>>, 
         IGraph<V, E> where V : IVertex where E : IEdge<V>
     {
-        private readonly IDictionary<V, ISet<E>> sources = new Dictionary<V, ISet<E>>();
-        private readonly IDictionary<V, ISet<E>> destinations = new Dictionary<V, ISet<E>>();
+        private readonly IImmutableDictionary<V, ISet<E>> sources;
+        private readonly IImmutableDictionary<V, ISet<E>> destinations;
 
         /// <inheritdoc/>
         public ISet<V> Vertices { get; }
@@ -32,26 +33,32 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             CheckNotNull(vertices, "Vertices cannot be null.");
             CheckNotNull(edges, "Edges cannot be null.");
-            var actualVertices = new HashSet<V>(vertices);
+            var srcMap = ImmutableDictionary.CreateBuilder<V, ISet<E>>();
+            var dstMap = ImmutableDictionary.CreateBuilder<V, ISet<E>>();
+            var actualVertices = ImmutableHashSet.CreateBuilder<V>();
+            actualVertices.UnionWith(vertices);
 
             foreach (E edge in edges)
             {
-                if (!sources.ContainsKey(edge.Src))
+                if (!srcMap.ContainsKey(edge.Src))
                 {
-                    sources.Add(edge.Src, new HashSet<E>());
+                    srcMap.Add(edge.Src, new HashSet<E>());
                 }
-                sources[edge.Src].Add(edge);
+                srcMap[edge.Src].Add(edge);
                 actualVertices.Add(edge.Src);
-                if (!destinations.ContainsKey(edge.Dst))
+                if (!dstMap.ContainsKey(edge.Dst))
                 {
-                    destinations.Add(edge.Dst, new HashSet<E>());
+                    dstMap.Add(edge.Dst, new HashSet<E>());
                 }
-                destinations[edge.Dst].Add(edge);
+                dstMap[edge.Dst].Add(edge);
                 actualVertices.Add(edge.Dst);
             }
 
-            Edges = edges;
-            Vertices = actualVertices;
+            Edges = edges.ToImmutableHashSet();
+            Vertices = actualVertices.ToImmutable();
+
+            sources = srcMap.ToImmutable();
+            destinations = dstMap.ToImmutable();
         }
 
         /// <inheritdoc/>

@@ -27,9 +27,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="edges">The set of graph edges.</param>
         public MutableAdjacencyListsGraph(ISet<V> vertices, ISet<E> edges)
         {
-            Vertices = vertices;
-            Edges = edges;
-            foreach (E edge in edges)
+            Vertices = new HashSet<V>(vertices);
+            Edges = new HashSet<E>(edges);
+            foreach (E edge in Edges)
             {
                 if (!sources.ContainsKey(edge.Src))
                 {
@@ -51,7 +51,15 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             if (Edges.Add(edge))
             {
+                if (!sources.ContainsKey(edge.Src))
+                {
+                    sources.Add(edge.Src, new HashSet<E>());
+                }
                 sources[edge.Src].Add(edge);
+                if (!destinations.ContainsKey(edge.Dst))
+                {
+                    destinations.Add(edge.Dst, new HashSet<E>());
+                }
                 destinations[edge.Dst].Add(edge);
             }
         }
@@ -101,10 +109,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            var that = obj as MutableAdjacencyListsGraph<V, E>;
-            return that != null &&
-                EqualityComparer<ISet<V>>.Default.Equals(this.Vertices, that.Vertices) &&
-                EqualityComparer<ISet<E>>.Default.Equals(this.Edges, that.Edges);
+            return obj is MutableAdjacencyListsGraph<V, E> that &&
+                EqualityComparer<ISet<V>>.Default.Equals(Vertices, that.Vertices) &&
+                EqualityComparer<ISet<E>>.Default.Equals(Edges, that.Edges);
         }
 
         /// <inheritdoc/>

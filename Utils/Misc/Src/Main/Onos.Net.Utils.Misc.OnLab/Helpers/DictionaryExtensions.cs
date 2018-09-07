@@ -24,5 +24,14 @@ namespace Onos.Net.Utils.Misc.OnLab.Helpers
             }
             return defaultValue;
         }
+
+        public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict, TKey key, TValue defaultValue = default)
+        {
+            if (dict.TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+            return defaultValue;
+        }
     }
 }
