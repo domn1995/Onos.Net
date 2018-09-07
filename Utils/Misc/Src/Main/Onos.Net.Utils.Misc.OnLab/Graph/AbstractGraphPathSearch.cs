@@ -263,7 +263,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="edge">The edge to test.</param>
         /// <param name="path">The path to test.</param>
         /// <returns>True if the edge's source is a vertex in the path already.</returns>
-        private static bool IsInPath(E edge, DefaultMutablePath<V, E> path) => path.Edges.Any(e => e.Src.Equals(e.Dst));
+        private static bool IsInPath(E edge, DefaultMutablePath<V, E> path) => path.Edges.Any(e => edge.Src.Equals(e.Dst));
 
         /// <summary>
         /// Checks the specified path search arguments for validity.
