@@ -8,19 +8,18 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// a genetic algorithm on the population and return the fittest solutions.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class GAPopulation<T> : List<T> where T : IGAOrganism
+    public class GaPopulation<T> : List<T> where T : IGaOrganism
     {
-        private Random r = new Random();
-        private IComparer<T> comparer = new GAComparer();
+        private readonly Random r = new Random();
 
         /// <summary>
         /// Steps the population through one generation. The 75%
         /// least fit organisms are killed off and replaced with
         /// the children of the 25% and some "random" newcomers.
         /// </summary>
-        public void Step()
+        private void Step()
         {
-            Sort(comparer);
+            Sort((org1, org2) => org1.Fitness.CompareTo(org2.Fitness));
             int maxSize = Count;
 
             for (int i = Count - 1; i > maxSize / 4; --i)
@@ -60,7 +59,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="sample">The number of solutions to ask for.</param>
         /// <param name="template">The template GAOrganism to seed the population with.</param>
         /// <returns>A new list containing sample number of organisms.</returns>
-        public IList<T> RunGA(int generations, int populationSize, int sample, T template)
+        public IList<T> RunGa(int generations, int populationSize, int sample, T template)
         {
             for (int i = 0; i < populationSize; ++i)
             {
@@ -78,11 +77,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             }
 
             return new List<T>(this);
-        }
-
-        private class GAComparer : IComparer<T>
-        {
-            public int Compare(T org1, T org2) => org1.Fitness.CompareTo(org2.Fitness);
         }
     }
 }

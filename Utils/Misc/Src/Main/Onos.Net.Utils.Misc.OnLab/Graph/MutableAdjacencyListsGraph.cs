@@ -10,8 +10,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// <typeparam name="E"></typeparam>
     public class MutableAdjacencyListsGraph<V, E> : IMutableGraph<V, E> where V : class, IVertex where E : class, IEdge<V>
     {
-        private readonly Dictionary<V, ISet<E>> sources;
-        private readonly Dictionary<V, ISet<E>> destinations;
+        private readonly Dictionary<V, ISet<E>> sources = new Dictionary<V, ISet<E>>();
+        private readonly Dictionary<V, ISet<E>> destinations = new Dictionary<V, ISet<E>>();
 
         /// <inheritdoc/>
         public ISet<V> Vertices { get; }
@@ -82,11 +82,11 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 ISet<E> srcEdges = sources[vertex];
                 ISet<E> dstEdges = destinations[vertex];
-                foreach (var srcEdge in srcEdges)
+                foreach (E srcEdge in srcEdges)
                 {
                     Edges.Remove(srcEdge);
                 }
-                foreach (var dstEdge in dstEdges)
+                foreach (E dstEdge in dstEdges)
                 {
                     Edges.Remove(dstEdge);
                 }

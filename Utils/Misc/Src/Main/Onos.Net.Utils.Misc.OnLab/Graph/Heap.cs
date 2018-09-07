@@ -55,15 +55,16 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <exception cref="InvalidOperationException">Heap is empty.</exception>
         public T ExtractExtreme()
         {
-            if (!IsEmpty)
+            if (IsEmpty)
             {
-                T extreme = Extreme;
-                data[0] = data.Last();
-                data.RemoveAt(data.Count - 1);
-                Heapify();
-                return extreme;
+                throw new InvalidOperationException("Heap is empty.");
             }
-            throw new InvalidOperationException("Heap is empty.");
+
+            T extreme = Extreme;
+            data[0] = data.Last();
+            data.RemoveAt(data.Count - 1);
+            Heapify();
+            return extreme;
         }
 
         /// <summary>

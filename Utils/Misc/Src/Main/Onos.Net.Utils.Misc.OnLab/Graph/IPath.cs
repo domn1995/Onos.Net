@@ -8,7 +8,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
     /// <typeparam name="E">The edge type.</typeparam>
-    public interface IPath<V, E> : IEdge<V> where V : IVertex where E : IEdge<V>
+    public interface IPath<out V, E> : IEdge<V> where V : IVertex where E : IEdge<V>
     {
         /// <summary>
         /// Gets the list of edges comprosing the path. Adjacent edges will

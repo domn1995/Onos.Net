@@ -35,20 +35,21 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
         public IWeight Subtract(IWeight otherWeight) => new TestDoubleWeight(Value - otherWeight.Value);
 
-        public int CompareTo(IWeight other)
+        public int CompareTo(object obj)
         {
-            return Value.CompareTo(other.Value);
+            if (obj is TestDoubleWeight other)
+            {
+                return Value.CompareTo(other.Value);
+            }
+
+            throw new InvalidOperationException($"Invalid comparison target type.");
         }
-
-        public static bool operator ==(TestDoubleWeight first, TestDoubleWeight second) => first.Equals(second);
-
-        public static bool operator !=(TestDoubleWeight first, TestDoubleWeight second) => !(first == second);
 
         public override bool Equals(object obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is TestDoubleWeight t ? IsEqual(t) : false;
+            return obj is TestDoubleWeight t && IsEqual(t);
         }
 
         public bool Equals(TestDoubleWeight other)

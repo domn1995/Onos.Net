@@ -5,7 +5,7 @@
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
     /// <typeparam name="E">THe edge type.</typeparam>
-    public interface IEdgeWeigher<V, E> where V : IVertex where E : IEdge<V>
+    public interface IEdgeWeigher<V, in E> where V : IVertex where E : IEdge<V>
     {
         /// <summary>
         /// Returns the weight of the given edge.

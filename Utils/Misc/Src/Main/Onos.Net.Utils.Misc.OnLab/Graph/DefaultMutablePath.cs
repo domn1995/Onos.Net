@@ -82,7 +82,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is DefaultMutablePath<V, E> other ? IsEqual(other) : false;
+            return obj is DefaultMutablePath<V, E> other && IsEqual(other);
         }
 
         /// <inheritdoc/>

@@ -28,8 +28,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void Equality()
         {
-            var vertices = new HashSet<TestVertex>() { A, B, C, D, E, F }.ToImmutableHashSet();
-            var vertices2 = new HashSet<TestVertex>() { A, B, C, D, E, F, G }.ToImmutableHashSet();
+            ImmutableHashSet<TestVertex> vertices = new HashSet<TestVertex>() { A, B, C, D, E, F }.ToImmutableHashSet();
+            ImmutableHashSet<TestVertex> vertices2 = new HashSet<TestVertex>() { A, B, C, D, E, F, G }.ToImmutableHashSet();
 
             var graph = new TestAdjacencyListsGraph(vertices, edges);
             var same = new TestAdjacencyListsGraph(vertices, edges);
@@ -42,7 +42,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void Basics()
         {
-            var vertices = new HashSet<TestVertex>() { A, B, C, D, E, F }.ToImmutableHashSet();
+            ImmutableHashSet<TestVertex> vertices = new HashSet<TestVertex>() { A, B, C, D, E, F }.ToImmutableHashSet();
             var graph = new TestAdjacencyListsGraph(vertices, edges);
             Assert.Equal(6, graph.Vertices.Count);
             Assert.Equal(5, graph.Edges.Count);

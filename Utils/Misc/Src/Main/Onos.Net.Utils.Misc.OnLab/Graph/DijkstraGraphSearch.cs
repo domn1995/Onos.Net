@@ -2,6 +2,7 @@
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
+    /// <inheritdoc />
     /// <summary>
     /// Implementation of the Dijkstra shortest-path graph search algorithm, 
     /// capable of finding all shortest paths between the source and destination.
@@ -15,7 +16,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             // Use the default result to remember cumulative costs and
             // parent edges to each respective vertex.
-            DefaultResult result = new DefaultResult(src, dst, maxPaths);
+            var result = new DefaultResult(src, dst, maxPaths);
 
             // Cost to reach the source vertex is 0, of course.
             result.UpdateVertex(src, default, weigher.InitialWeight, false);

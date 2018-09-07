@@ -1,5 +1,6 @@
 ﻿using Onos.Net.Utils.Misc.OnLab.Graph;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -29,9 +30,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         {
             Graph = new TestAdjacencyListsGraph(Vertices, Edges);
             IGraphPathSearch<TestVertex, TestEdge> search = GraphSearch;
-            var paths = search.Search(Graph, A, H, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
+            ISet<IPath<TestVertex, TestEdge>> paths = search.Search(Graph, A, H, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
             Assert.Equal(1, paths.Count);
-            var p = paths.First();
+            IPath<TestVertex, TestEdge> p = paths.First();
             Assert.Equal(A, p.Src);
             Assert.Equal(H, p.Dst);
             Assert.Equal(pathLength, p.Edges.Count);
@@ -45,13 +46,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             IGraph<TestVertex, TestEdge> graph, TestVertex src, TestVertex dst,
             IEdgeWeigher<TestVertex, TestEdge> weigher, int pathCount, IWeight pathCost)
         {
-            var result = search.Search(graph, src, dst, weigher, TestAbstractGraphPathSearch.AllPaths);
-            var paths = result.Paths;
+            IResult<TestVertex, TestEdge> result = search.Search(graph, src, dst, weigher, TestAbstractGraphPathSearch.AllPaths);
+            ISet<IPath<TestVertex, TestEdge>> paths = result.Paths;
             PrintPaths(paths);
             Assert.Equal(pathCount, paths.Count);
             if (pathCount > 0)
             {
-                var path = paths.First();
+                IPath<TestVertex, TestEdge> path = paths.First();
                 Assert.Equal(pathCost, path.Cost);
             }
         }
@@ -60,13 +61,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
            IGraph<TestVertex, TestEdge> graph, TestVertex src, TestVertex dst,
            IEdgeWeigher<TestVertex, TestEdge> weigher, int pathCount, IWeight pathCost)
         {
-            var result = search.Search(graph, src, dst, weigher, 1);
-            var paths = result.Paths;
+            IResult<TestVertex, TestEdge> result = search.Search(graph, src, dst, weigher, 1);
+            ISet<IPath<TestVertex, TestEdge>> paths = result.Paths;
             PrintPaths(paths);
             Assert.Equal(Math.Min(pathCount, 1), paths.Count);
             if (pathCount > 0)
             {
-                var path = paths.First();
+                IPath<TestVertex, TestEdge> path = paths.First();
                 Assert.Equal(pathCost, path.Cost);
             }
         }

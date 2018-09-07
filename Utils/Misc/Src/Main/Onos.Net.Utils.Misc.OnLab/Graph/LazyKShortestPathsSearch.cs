@@ -17,8 +17,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// TODO: Make this less complex. Can we just use IEnumerable for Dijkstra?
     public class LazyKShortestPathsSearch<V, E> where V : class, IVertex where E : class, IEdge<V>
     {
-        private readonly IComparer<IPath<V, E>> pathComparer = new PathComparer();
-        public static IGraphPathSearch<V, E> Shortest { get; } = new DijkstraGraphSearch<V, E>();
+        private static readonly IGraphPathSearch<V, E> search = new DijkstraGraphSearch<V, E>();
 
         /// <summary>
         /// Searches the given graph for paths between the given vertices.
@@ -31,7 +30,16 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         public IEnumerable<IPath<V, E>> LazyPathSearch(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher)
         {
             var enumerator = new ShortestPathEnumerator(graph, src, dst, weigher);
+            var paths = new SortedSet<IPath<V, E>>(EnumeratePaths(enumerator), new PathComparer());
 
+            foreach (IPath<V, E> path in paths)
+            {
+                yield return path;
+            }
+        }
+
+        private IEnumerable<IPath<V, E>> EnumeratePaths(ShortestPathEnumerator enumerator)
+        {
             while (enumerator.MoveNext())
             {
                 yield return enumerator.Current;
@@ -44,21 +52,20 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         private sealed class ShortestPathEnumerator : IEnumerator<IPath<V, E>>
         {
             private readonly IGraph<V, E> graph;
-            private readonly V src;
             private readonly V dst;
             private readonly IEdgeWeigher<V, E> weigher;
             private readonly InnerEdgeWeigher maskingWeigher;
             private readonly IList<IPath<V, E>> resultPaths = new List<IPath<V, E>>();
-            private readonly C5.IPriorityQueue<IPath<V, E>> potentialPaths = new C5.IntervalHeap<IPath<V, E>>();
+            private readonly C5.IPriorityQueue<IPath<V, E>> potentialPaths = new C5.IntervalHeap<IPath<V, E>>(new PathComparer());
             private Func<IPath<V, E>> next;
             public ShortestPathEnumerator(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher)
             {
                 this.graph = CheckNotNull(graph);
-                this.src = CheckNotNull(src);
+                CheckNotNull(src);
                 this.dst = CheckNotNull(dst);
                 this.weigher = CheckNotNull(weigher);
                 maskingWeigher = new InnerEdgeWeigher(weigher);
-                next = () => Shortest.Search(graph, src, dst, weigher, 1).Paths.FirstOrDefault();
+                next = () => search.Search(graph, src, dst, weigher, 1).Paths.FirstOrDefault();
             }
 
             public IPath<V, E> Current { get; private set; }
@@ -72,16 +79,23 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
             public bool MoveNext()
             {
-                if (next() == null)
+                IPath<V, E> current = next();
+
+                if (current is null)
                 {
-                    throw new InvalidOperationException($"No more paths between {src}--{dst}");
+                    return false;
                 }
 
-                // The path to be on at the end of this call.
-                var lastPath = next();
-                resultPaths.Add(lastPath);
-                next = Memoizer.Memoize(() => ComputeNext(lastPath));
-                Current = lastPath;
+                // TODO: Short circuiting here in order to prevent duplicate paths.
+                // Could this introduce unexpected behavior to its consumers?
+                //if (resultPaths.Contains(current))
+                //{
+                //    return false;
+                //}
+
+                Current = current;                
+                resultPaths.Add(current);
+                next = Memoizer.Memoize(() => ComputeNext(current));
                 return true;
             }
 
@@ -96,9 +110,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 for (int i = 0; i < lastPath.Edges.Count; ++i)
                 {
                     V spurNode = lastPath.Edges[i].Src;
-                    var rootPathEdgeList = lastPath.Edges.Take(i).ToList();
+                    List<E> rootPathEdgeList = lastPath.Edges.Take(i).ToList();
 
-                    foreach (var path in resultPaths)
+                    foreach (IPath<V, E> path in resultPaths)
                     {
                         if (path.Edges.Count >= i && rootPathEdgeList.SequenceEqual(path.Edges.Take(i)))
                         {
@@ -107,22 +121,22 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                     }
 
                     // Effectively remove all root path nodes other than the spur node.
-                    foreach (var edge in rootPathEdgeList)
+                    foreach (E edge in rootPathEdgeList)
                     {
-                        foreach (var e in graph.GetEdgesFrom(edge.Src))
+                        foreach (E e in graph.GetEdgesFrom(edge.Src))
                         {
                             maskingWeigher.Excluded.Add(e);
                         }
-                        foreach (var e in graph.GetEdgesTo(edge.Src))
+                        foreach (E e in graph.GetEdgesTo(edge.Src))
                         {
                             maskingWeigher.Excluded.Add(e);
                         }
                     }
 
-                    var spurPath = Shortest.Search(graph, spurNode, dst, maskingWeigher, 1).Paths.FirstOrDefault();
+                    IPath<V, E> spurPath = search.Search(graph, spurNode, dst, maskingWeigher, 1).Paths.FirstOrDefault();
                     if (spurPath != null)
                     {
-                        var builder = ImmutableList.CreateBuilder<E>();
+                        ImmutableList<E>.Builder builder = ImmutableList.CreateBuilder<E>();
                         builder.AddRange(rootPathEdgeList);
                         builder.AddRange(spurPath.Edges);
                         potentialPaths.Add(Path(builder.ToImmutable()));
@@ -132,14 +146,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                     maskingWeigher.Excluded.Clear();
                 }
 
-                if (potentialPaths.IsEmpty)
-                {
-                    return null;
-                }
-                else
-                {
-                    return potentialPaths.DeleteMax();
-                }
+                return potentialPaths.IsEmpty ? null : potentialPaths.DeleteMax();
             }
 
             /// <summary>
@@ -157,10 +164,10 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// <param name="weigher">The weigher to use.</param>
             /// <param name="edges">The edges to sum.</param>
             /// <returns>The sum of path cost between the given edges.</returns>
-            private IWeight CalculatePathCost(IEdgeWeigher<V, E> weigher, IList<E> edges)
+            private IWeight CalculatePathCost(IEdgeWeigher<V, E> weigher, IEnumerable<E> edges)
             {
                 IWeight totalCost = weigher.InitialWeight;
-                foreach (var edge in edges)
+                foreach (E edge in edges)
                 {
                     totalCost = totalCost.Merge(weigher.GetWeight(edge));
                 }
@@ -169,6 +176,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         }
 
 
+        /// <inheritdoc />
         /// <summary>
         /// Provides an edge weigher which excludes specified edges from path computation.
         /// </summary>
@@ -183,14 +191,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
             public IWeight NonViableWeight => weigher.NonViableWeight;
 
-            public IWeight GetWeight(E edge)
-            {
-                if (Excluded.Contains(edge))
-                {
-                    return weigher.NonViableWeight;
-                }
-                return weigher.GetWeight(edge);
-            }
+            public IWeight GetWeight(E edge) => Excluded.Contains(edge) ? weigher.NonViableWeight : weigher.GetWeight(edge);
         }
 
         /// <summary>
@@ -201,13 +202,17 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             public int Compare(IPath<V, E> path1, IPath<V, E> path2)
             {
+                int result;
                 // If they're the same cost, let's take the one with fewer hops.
-                if (path1.Cost == path2.Cost)
+                if (path1.Cost.Equals(path2?.Cost))
                 {
-                    return path1.Edges.Count.CompareTo(path2.Edges.Count);
+                    result = path1.Edges.Count.CompareTo(path2.Edges.Count);
                 }
-
-                return path1.Cost.CompareTo(path2.Cost);
+                else
+                {
+                    result = path1.Cost.CompareTo(path2.Cost);
+                }
+                return result;
             }
         }
     }

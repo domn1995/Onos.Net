@@ -8,7 +8,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
     /// <typeparam name="E">The edge type.</typeparam>
-    public class DisjointPathPair<V, E> : IPath<V, E> where V : IVertex where E : IEdge<V>
+    public class DisjointPathPair<V, E> : IEquatable<DisjointPathPair<V, E>>,
+                                          IPath<V, E> where V : IVertex where E : IEdge<V>
     {
         /// <summary>
         /// Gets the primary path.
@@ -50,24 +51,37 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="secondary">The secondary path.</param>
         public DisjointPathPair(IPath<V, E> primary, IPath<V, E> secondary) => (Primary, Secondary) = (primary, secondary);
 
+        public bool Equals(DisjointPathPair<V, E> other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return IsEqual(other);
+        }
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            var other = obj as DisjointPathPair<V, E>;
-            return other != null &&
-                EqualityComparer<V>.Default.Equals(Src, other.Src) &&
-                EqualityComparer<V>.Default.Equals(Dst, other.Dst) &&
-                (EqualityComparer<IPath<V, E>>.Default.Equals(Primary, other.Primary) &&
-                    EqualityComparer<IPath<V, E>>.Default.Equals(Secondary, other.Secondary)) ||
-                (EqualityComparer<IPath<V, E>>.Default.Equals(Primary, other.Secondary) &&
-                    EqualityComparer<IPath<V, E>>.Default.Equals(Secondary, other.Primary));
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is DisjointPathPair<V, E> other && IsEqual(other);
+        }
 
+        protected virtual bool IsEqual(DisjointPathPair<V, E> other)
+        {
+            bool result = Src.Equals(other.Src) &&
+                   Dst.Equals(other.Dst) &&
+                   (Primary.Equals(other.Primary) &&
+                        Secondary.Equals(other.Secondary)) ||
+                   (Primary.Equals(other.Secondary) &&
+                        Secondary.Equals(other.Primary));
+            return result;
         }
 
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return HasBackup ? Primary.GetHashCode() + Secondary.GetHashCode() : HashCode.Combine(Primary);
+            int code = HasBackup ? Primary.GetHashCode() + Secondary.GetHashCode() : Primary.GetHashCode();
+            return code;
         }
 
         /// <inheritdoc/>

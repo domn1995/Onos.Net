@@ -9,10 +9,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
         public TestVertex(string name) => this.name = name;
 
-        public static bool operator ==(TestVertex first, TestVertex second) => first.Equals(second);
-
-        public static bool operator !=(TestVertex first, TestVertex second) => !(first == second);
-
         public bool Equals(TestVertex other)
         {
             if (other is null) return false;
@@ -24,7 +20,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is TestVertex v ? IsEqual(v) : false;
+            return obj is TestVertex v && IsEqual(v);
         }
 
         private bool IsEqual(TestVertex other) => name == other.name;

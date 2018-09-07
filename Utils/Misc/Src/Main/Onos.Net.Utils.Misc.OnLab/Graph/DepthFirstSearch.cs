@@ -37,7 +37,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         protected override IResult<V, E> InternalSearch(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = -1)
         {
             // Prepare the search result.
-            SpanningTreeResult result = new SpanningTreeResult(src, dst, maxPaths);
+            var result = new SpanningTreeResult(src, dst, maxPaths);
 
             // The source vertex has cost 0, of course.
             result.UpdateVertex(src, default, weigher.InitialWeight, true);
@@ -137,6 +137,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             return false;
         }
         
+        /// <inheritdoc />
         /// <summary>
         /// Graph search result which includes edge classification for building a spanning tree.
         /// </summary>
@@ -147,8 +148,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// </summary>
             public IDictionary<E, EdgeType> Edges { get; } = new Dictionary<E, EdgeType>();
 
+            /// <inheritdoc />
             /// <summary>
-            /// Initializes a new <see cref="SpanningTreeResult"/> instance with the given values.
+            /// Initializes a new <see cref="T:Onos.Net.Utils.Misc.OnLab.Graph.DepthFirstSearch`2.SpanningTreeResult" /> instance with the given values.
             /// </summary>
             /// <param name="src">The source vertex.</param>
             /// <param name="dst">The destination vertex.</param>

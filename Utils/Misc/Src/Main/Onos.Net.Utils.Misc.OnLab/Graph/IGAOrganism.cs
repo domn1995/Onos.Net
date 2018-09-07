@@ -7,7 +7,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// to a problem that can be evaluated in terms of fitness. These organisms can 
     /// be used to represent any class of problem that genetic algorithms can solve.
     /// </summary>
-    public interface IGAOrganism
+    public interface IGaOrganism
     {
         /// <summary>
         /// Gets a fitness function that determines how optimal a given organism is.
@@ -23,7 +23,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// Creates a new random organism.
         /// </summary>
         /// <returns>A new random organism.</returns>
-        IGAOrganism GetRandom();
+        IGaOrganism GetRandom();
 
         /// <summary>
         /// Returns a child organism that is the result
@@ -31,6 +31,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// </summary>
         /// <param name="other">The other organism with which to cross.</param>
         /// <returns>A child organism.</returns>
-        IGAOrganism CrossWith(IGAOrganism other);
+        IGaOrganism CrossWith(IGaOrganism other);
     }
 }

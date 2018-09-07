@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
@@ -15,7 +16,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         private readonly int iterations = 100;
         private readonly int popSize = 50;
         private readonly int numGroups;
-        private IDictionary<E, int> riskGrouping;
+        private readonly IDictionary<E, int> riskGrouping;
         private IGraph<V, E> orig;
         private V src, dst;
         private IEdgeWeigher<V, E> weigher;
@@ -38,7 +39,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// </summary>
         /// <param name="grouping">The map linking edges to object group assignemnts,
         /// with same-group status linked to equality.</param>
-        public SrlgGraphSearch(IDictionary<E, object> grouping)
+        public SrlgGraphSearch(IDictionary<E, object> grouping = null)
         {
             if (grouping is null)
             {
@@ -46,7 +47,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 return;
             }
             numGroups = 0;
-            Dictionary<object, int> tmpMap = new Dictionary<object, int>();
+            var tmpMap = new Dictionary<object, int>();
             riskGrouping = new Dictionary<E, int>();
             foreach (E key in grouping.Keys)
             {
@@ -75,16 +76,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             this.src = src;
             this.dst = dst;
             this.weigher = weigher;
-            var best = new GAPopulation<Subset>().RunGA(iterations, popSize, maxPaths, new Subset(this, new bool[numGroups]));
+            IList<Subset> best = new GaPopulation<Subset>().RunGa(iterations, popSize, maxPaths, new Subset(this, new bool[numGroups]));
             var dpps = new HashSet<DisjointPathPair<V, E>>();
             foreach (Subset s in best)
             {
-                foreach (var p in s.BuildPaths())
-                {
-                    dpps.Add(p);
-                }
+                dpps.UnionWith(s.BuildPaths());
             }
-            var firstDijkstra = new DijkstraGraphSearch<V, E>().Search(orig, src, dst, weigher, 1);
+            IResult<V, E> firstDijkstra = new DijkstraGraphSearch<V, E>().Search(orig, src, dst, weigher, 1);
             var result = new InternalResult(this, firstDijkstra, dpps);
             return result;
         }
@@ -97,8 +95,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         private IResult<V, E> FindShortestPathFromSubset(bool[] subset)
         {
             IGraph<V, E> graph = orig;
-            IEdgeWeigher<V, E> modified = new InternalWeigher(this, subset);
-            var res = new DijkstraGraphSearch<V, E>().Search(graph, src, dst, modified, 1);
+            IEdgeWeigher<V, E> modified = new InternalWeigher(weigher, riskGrouping, subset);
+            IResult<V, E> res = new DijkstraGraphSearch<V, E>().Search(graph, src, dst, modified, 1);
             return res;
         }
 
@@ -127,7 +125,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 get
                 {
                     var pathsD = new HashSet<IPath<V, E>>();
-                    foreach (var path in dpps)
+                    foreach (DisjointPathPair<V, E> path in dpps)
                     {
                         pathsD.Add(path);
                     }
@@ -145,22 +143,25 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// </summary>
         private sealed class InternalWeigher : IEdgeWeigher<V, E>
         {
-            private readonly SrlgGraphSearch<V, E> search;
-            private readonly bool[] subset;
+            private readonly IEdgeWeigher<V, E> weigher;
+            private readonly IDictionary<E, int> riskGrouping;
+            private readonly bool[] subsetF;
 
-            public InternalWeigher(SrlgGraphSearch<V, E> search, bool[] subset) => (this.search, this.subset) = (search, subset);
+            public InternalWeigher(IEdgeWeigher<V, E> weigher, IDictionary<E, int> riskGrouping, bool[] subset) 
+                => (this.weigher, this.riskGrouping, subsetF) = (weigher, riskGrouping, subset);
 
-            public IWeight InitialWeight => search.weigher.InitialWeight;
+            public IWeight InitialWeight => weigher.InitialWeight;
 
-            public IWeight NonViableWeight => search.weigher.NonViableWeight;
+            public IWeight NonViableWeight => weigher.NonViableWeight;
 
+            // TODO: Erroniosly returning non viable.
             public IWeight GetWeight(E edge)
             {
-                if (subset[search.riskGrouping[edge]])
+                if (subsetF[riskGrouping[edge]])
                 {
-                    return search.weigher.GetWeight(edge);
+                    return weigher.GetWeight(edge);
                 }
-                return search.weigher.NonViableWeight;
+                return weigher.NonViableWeight;
             }
         }
 
@@ -169,7 +170,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// shortest paths (and its complement). Its fitness is determined 
         /// by the sum of the weights of the first two shortest paths.
         /// </summary>
-        private class Subset : IGAOrganism
+        private class Subset : IGaOrganism
         {
             private readonly SrlgGraphSearch<V, E> search;
             private readonly bool[] subset;
@@ -180,13 +181,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 get
                 {
-                    var paths1 = search.FindShortestPathFromSubset(subset).Paths;
-                    var paths2 = search.FindShortestPathFromSubset(not).Paths;
+                    ISet<IPath<V, E>> paths1 = search.FindShortestPathFromSubset(subset).Paths;
+                    ISet<IPath<V, E>> paths2 = search.FindShortestPathFromSubset(not).Paths;
                     if (paths1.Count == 0 || paths2.Count == 0)
                     {
-                        return (IComparable)search.weigher.NonViableWeight;
+                        return search.weigher.NonViableWeight;
                     }
-                    return (IComparable)paths1.First().Cost.Merge(paths2.First().Cost);
+                    return paths1.First().Cost.Merge(paths2.First().Cost);
                 }
             }
 
@@ -206,7 +207,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 }
             }
 
-            public IGAOrganism GetRandom()
+            public IGaOrganism GetRandom()
             {
                 bool[] sub = new bool[subset.Length];
                 for (int i = 0; i < sub.Length; ++i)
@@ -216,14 +217,14 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 return new Subset(search, sub);
             }
 
-            public IGAOrganism CrossWith(IGAOrganism org)
+            public IGaOrganism CrossWith(IGaOrganism org)
             {
-                if (!(org.GetType().Equals(this.GetType())))
+                if (org.GetType() != this.GetType())
                 {
                     return this;
                 }
-                Subset other = (Subset)org;
-                bool[] sub = new bool[subset.Length];
+                var other = (Subset)org;
+                var sub = new bool[subset.Length];
                 for (int i = 0; i < subset.Length; ++i)
                 {
                     sub[i] = subset[i];
@@ -256,9 +257,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             public ISet<DisjointPathPair<V, E>> BuildPaths()
             {
                 var dpps = new HashSet<DisjointPathPair<V, E>>();
-                foreach (var path1 in search.FindShortestPathFromSubset(subset).Paths)
+                foreach (IPath<V, E> path1 in search.FindShortestPathFromSubset(subset).Paths)
                 {
-                    foreach (var path2 in search.FindShortestPathFromSubset(not).Paths)
+                    foreach (IPath<V, E> path2 in search.FindShortestPathFromSubset(not).Paths)
                     {
                         var dpp = new DisjointPathPair<V, E>(path1, path2);
                         dpps.Add(dpp);

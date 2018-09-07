@@ -13,7 +13,7 @@
         protected override IResult<V, E> InternalSearch(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = -1)
         {
             // Prepare the graph search result.
-            DefaultResult result = new DefaultResult(src, dst, maxPaths);
+            var result = new DefaultResult(src, dst, maxPaths);
             // The source vertex has cost 0, of course.
             result.UpdateVertex(src, default, weigher.InitialWeight, true);
             int max = graph.Vertices.Count - 1;

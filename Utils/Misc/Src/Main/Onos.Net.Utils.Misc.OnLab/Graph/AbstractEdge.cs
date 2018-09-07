@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
@@ -28,16 +27,12 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             Dst = CheckNotNull(dst);
         }
 
-        public static bool operator ==(AbstractEdge<V> first, AbstractEdge<V> second) => first.Equals(second);
-
-        public static bool operator !=(AbstractEdge<V> first, AbstractEdge<V> second) => !(first == second);
-
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is AbstractEdge<V> edge ? IsEqual(edge) : false;
+            return obj is AbstractEdge<V> edge && IsEqual(edge);
         }
 
         /// <inheritdoc/>
@@ -63,8 +58,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"[{GetType().Name}] Src = {Src}, Dst = {Dst}";
-
-        
+        public override string ToString() => $"[{GetType().Name}] Src = {Src}, Dst = {Dst}";        
     }
 }

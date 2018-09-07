@@ -65,7 +65,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
         protected void PrintPaths(ISet<IPath<TestVertex, TestEdge>> paths)
         {
-            foreach (var p in paths)
+            foreach (IPath<TestVertex, TestEdge> p in paths)
             {
                 Console.WriteLine(p);
             }

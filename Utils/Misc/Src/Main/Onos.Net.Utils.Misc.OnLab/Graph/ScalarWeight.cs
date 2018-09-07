@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -6,13 +7,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// Weight implementation based on a double value.
     /// </summary>
     /// TODO: Implement operator+ and operator- overloading.
-    public class ScalarWeight : IWeight
+    public class ScalarWeight : IWeight, IEquatable<ScalarWeight>
     {
         /// <summary>
         /// Gets or sets the sameness threshold for comparsing cost values.
         /// Default value is <see cref="double.MinValue"/>.
         /// </summary>
-        public static double SamenessTreshold { get; set; } = double.MinValue;
+        public static double SamenessTreshold { get; set; } = double.Epsilon;
 
         /// <summary>
         /// Gets an instance of <see cref="ScalarWeight"/> to make links/paths which cannot be traversed.
@@ -42,7 +43,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         public static ScalarWeight ToWeight(double value) => new ScalarWeight(value);
 
         /// <inheritdoc/>
-        public int CompareTo(IWeight otherWeight)
+        public int CompareTo(object otherWeight)
         {
             if (Equals(otherWeight))
             {
@@ -60,11 +61,21 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (obj is ScalarWeight sw)
-            {
-                return Equals(sw);
-            }
-            return false;
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is ScalarWeight other && IsEqual(other);
+        }
+
+        public bool Equals(ScalarWeight other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return IsEqual(other);
+        }
+
+        public virtual bool IsEqual(IWeight other)
+        {
+            return Math.Abs(other.Value - Value) < SamenessTreshold;
         }
 
         /// <inheritdoc/>
@@ -75,8 +86,5 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
         /// <inheritdoc/>
         public override string ToString() => $"[{GetType().Name}] Value = {Value}";
-
-        /// <inheritdoc/>
-        public bool Equals(IWeight other) => Math.Abs(other.Value - Value) < SamenessTreshold;
     }
 }

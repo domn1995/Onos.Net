@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Onos.Net.Utils.Misc.OnLab.Graph;
 using Xunit;
@@ -35,12 +36,12 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         protected void ExecuteDefaultTest(int minLength, int maxLength, IWeight minCost, IWeight maxCost)
         {
             Graph = new TestAdjacencyListsGraph(Vertices, Edges);
-            var search = GraphSearch;
+            TestAbstractGraphPathSearch search = GraphSearch;
             SpanningTreeResult result = (SpanningTreeResult)search.Search(Graph, A, H, Weigher, 1);
-            var paths = result.Paths;
+            ISet<IPath<TestVertex, TestEdge>> paths = result.Paths;
             Assert.Equal(1, paths.Count);
 
-            var path = paths.First();
+            IPath<TestVertex, TestEdge> path = paths.First();
             Console.WriteLine(path);
             Assert.Equal(A, path.Src);
             Assert.Equal(H, path.Dst);
@@ -56,12 +57,12 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         public void ExecuteBroadSearch()
         {
             Graph = new TestAdjacencyListsGraph(Vertices, Edges);
-            var search = GraphSearch;
+            TestAbstractGraphPathSearch search = GraphSearch;
             SpanningTreeResult result = (SpanningTreeResult)search.Search(Graph, A, null, Weigher, TestAbstractGraphPathSearch.AllPaths);
             Assert.Equal(7, result.Paths.Count);
 
             int[] types = new int[] { 0, 0, 0, 0 };
-            foreach (var type in result.Edges.Values)
+            foreach (EdgeType type in result.Edges.Values)
             {
                 types[(int)type] += 1;
             }

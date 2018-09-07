@@ -23,8 +23,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void NoPath()
         {
-            var vertices = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
-            var edges = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> vertices = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> edges = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B),
                 new TestEdge(B, A),
@@ -33,8 +33,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             }.ToImmutableHashSet();
 
             var graph = new TestAdjacencyListsGraph(vertices, edges);
-            var result = NewSearch.Search(graph, A, D, Weigher, 1);
-            var resultPathSet = result.Paths;
+            IResult<TestVertex, TestEdge> result = NewSearch.Search(graph, A, D, Weigher, 1);
+            ISet<IPath<TestVertex, TestEdge>> resultPathSet = result.Paths;
             Assert.True(resultPathSet.Count == 0);
         }
 
@@ -44,7 +44,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void SinglePath()
         {
-            var result = NewSearch.Search(NewGraph, A, B, Weigher, 2);
+            IResult<TestVertex, TestEdge> result = NewSearch.Search(NewGraph, A, B, Weigher, 2);
             Assert.Equal(1, result.Paths.Count);
             var correctEdgeList = new List<TestEdge>()
             {
@@ -59,8 +59,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void ResultsAreOnlyOneHopPathPlusLongerOnes()
         {
-            var result = NewSearch.Search(NewGraph, B, D, HopWeigher, 42);
-            var paths = result.Paths.ToList();
+            IResult<TestVertex, TestEdge> result = NewSearch.Search(NewGraph, B, D, HopWeigher, 42);
+            List<IPath<TestVertex, TestEdge>> paths = result.Paths.ToList();
             Assert.Equal(3, paths.Count);
             // The shorest path is 1 hop.
             Assert.Equal(1, paths[0].Edges.Count);
@@ -76,9 +76,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void TwoPath()
         {
-            var result = NewSearch.Search(NewGraph, A, C, Weigher, 3);
+            IResult<TestVertex, TestEdge> result = NewSearch.Search(NewGraph, A, C, Weigher, 3);
             Assert.True(result.Paths.Count == 2);
-            var paths = result.Paths.ToList();
+            List<IPath<TestVertex, TestEdge>> paths = result.Paths.ToList();
             var correctEdgeList = new List<TestEdge>()
             {
                 new TestEdge(A, B, W1),
@@ -97,9 +97,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void FourPath()
         {
-            var result = NewSearch.Search(NewGraph, A, E, Weigher, 5);
+            IResult<TestVertex, TestEdge> result = NewSearch.Search(NewGraph, A, E, Weigher, 5);
             Assert.True(result.Paths.Count == 4);
-            var paths = result.Paths.ToList();
+            List<IPath<TestVertex, TestEdge>> paths = result.Paths.ToList();
             var correctEdgeList = new List<TestEdge>()
             {
                 new TestEdge(A, B, W1),
@@ -120,8 +120,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(B, D, W2),
                 new TestEdge(D, E, W1),
             };
-            var candidateOne = paths[1].Edges;
-            var candidateTwo = paths[2].Edges;
+            IList<TestEdge> candidateOne = paths[1].Edges;
+            IList<TestEdge> candidateTwo = paths[2].Edges;
             if (candidateOne.Count == 2)
             {
                 Assert.True(candidateOne.SequenceEqual(correctEdgeList));
@@ -160,7 +160,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void LimitPathSetSize()
         {
-            var result = NewSearch.Search(NewGraph, A, E, Weigher, 3);
+            IResult<TestVertex, TestEdge> result = NewSearch.Search(NewGraph, A, E, Weigher, 3);
             Assert.Equal(3, result.Paths.Count);
             result = NewSearch.Search(NewGraph, A, G, Weigher, 1);
             Assert.Equal(1, result.Paths.Count);
@@ -182,8 +182,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void VariableLenPathsWithConstantLinkWeight()
         {
-            var vertices = new HashSet<TestVertex>() { A, B, C, D, E, F, G, H }.ToImmutableHashSet();
-            var edges = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> vertices = new HashSet<TestVertex>() { A, B, C, D, E, F, G, H }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> edges = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B),
                 new TestEdge(B, A), new TestEdge(B, C),
@@ -196,9 +196,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(B, F),
             }.ToImmutableHashSet();
             var graph = new TestAdjacencyListsGraph(vertices, edges);
-            var result = NewSearch.Search(graph, A, G, Weigher, 8);
+            IResult<TestVertex, TestEdge> result = NewSearch.Search(graph, A, G, Weigher, 8);
             Assert.Equal(2, result.Paths.Count);
-            var paths = result.Paths.ToList();
+            List<IPath<TestVertex, TestEdge>> paths = result.Paths.ToList();
             var correctEdgeList = new List<TestEdge>()
             {
                 new TestEdge(A, B),

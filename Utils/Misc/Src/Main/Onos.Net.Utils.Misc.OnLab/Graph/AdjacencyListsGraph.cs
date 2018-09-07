@@ -32,7 +32,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             CheckNotNull(vertices, "Vertices cannot be null.");
             CheckNotNull(edges, "Edges cannot be null.");
-            HashSet<V> actualVertices = new HashSet<V>(vertices);
+            var actualVertices = new HashSet<V>(vertices);
 
             foreach (E edge in edges)
             {
@@ -65,7 +65,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is AdjacencyListsGraph<V, E> graph ? IsEqual(graph) : false;
+            return obj is AdjacencyListsGraph<V, E> graph && IsEqual(graph);
         }
 
         /// <inheritdoc/>
@@ -92,7 +92,5 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
         /// <inheritdoc/>
         public override string ToString() => $"[{GetType().Name}] Vertices = {Vertices}, Edges = {Edges}";
-
-        
     }
 }

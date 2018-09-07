@@ -5,8 +5,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
     /// <summary>
     /// Enables implementing classes to represent a graph edge weight.
     /// </summary>
-    /// TODO: Implement operator+ and operator- overloading.
-    public interface IWeight : IComparable<IWeight>
+    public interface IWeight : IComparable
     {
         /// <summary>
         /// Gets the weight's value.

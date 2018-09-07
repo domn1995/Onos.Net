@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
-    public class DefaultPath<V, E> : IEquatable<DefaultPath<V, E>>, IPath<V, E> where V : class, IVertex where E : class, IEdge<V>
+    /// <summary>
+    /// Simple concrete implementation of a directed graph path.
+    /// </summary>
+    /// <typeparam name="V">The vertex type.</typeparam>
+    /// <typeparam name="E">The edge type.</typeparam>
+    public class DefaultPath<V, E> : IEquatable<DefaultPath<V, E>>, IPath<V, E>
+        where V : class, IVertex where E : class, IEdge<V>
     {
         private readonly IList<E> edges;
 
@@ -33,6 +38,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 throw new ArgumentException("There must be at least one edge.");
             }
+
             this.edges = edges;
             Src = Edges[0].Src;
             Dst = Edges.Last().Dst;
@@ -40,14 +46,15 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"[{GetType().Name}] Src = {Src}, Dst = {Dst}, Cost = {Cost}, Edges = {edges}";
+        public override string ToString() =>
+            $"[{GetType().Name}] Src = {Src}, Dst = {Dst}, Cost = {Cost}, Edges = {edges}";
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is DefaultPath<V, E> path ? IsEqual(path) : false;
+            return obj is DefaultPath<V, E> path && IsEqual(path);
         }
 
         /// <inheritdoc/>
@@ -65,15 +72,24 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <returns>True if the objects are equal.</returns>
         protected virtual bool IsEqual(DefaultPath<V, E> other)
         {
-            return Src.Equals(other.Src) &&
+            bool result = Src.Equals(other.Src) &&
                    Dst.Equals(other.Dst) &&
+                   edges.SequenceEqual(other.Edges) &&
                    // TODO: This is clunky, is there a better way?
-                   other.Cost is null ? Cost is null 
-                      : Cost.Equals(other.Cost)  &&
-                   Edges.SequenceEqual(other.Edges);
+                   other.Cost is null ? Cost is null : other.Cost.Equals(Cost);
+            return result;
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(edges, Cost, Src, Dst);
+        public override int GetHashCode()
+        {
+            int edgesHash = int.MinValue;
+            foreach (int hash in edges.Select(e => e.GetHashCode()))
+            {
+                edgesHash ^= hash;
+            }
+            int finalHash = HashCode.Combine(edgesHash, Cost, Src, Dst);
+            return finalHash;
+        }
     }
 }

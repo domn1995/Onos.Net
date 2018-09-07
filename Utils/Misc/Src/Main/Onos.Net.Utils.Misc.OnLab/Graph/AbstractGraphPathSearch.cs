@@ -1,5 +1,4 @@
 ﻿using Onos.Net.Utils.Misc.OnLab.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Onos.Net.Utils.Misc.OnLab.Helpers.ArgsChecker;
@@ -86,23 +85,25 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             public void UpdateVertex(V vertex, E edge, IWeight cost, bool replace)
             {
                 Costs.SetOrAdd(vertex, cost);
-                
-                if (edge != null)
+
+                if (edge is null)
                 {
-                    ISet<E> edges = Parents.GetOrDefault(vertex);
-                    if (edges == null)
-                    {
-                        edges = new HashSet<E>();
-                        Parents.Add(vertex, edges);
-                    }
-                    if (replace)
-                    {
-                        edges.Clear();
-                    }
-                    if (MaxPaths == AllPaths || edges.Count < MaxPaths)
-                    {
-                        edges.Add(edge);
-                    }
+                    return;
+                }
+
+                ISet<E> edges = Parents.GetOrDefault(vertex);
+                if (edges == null)
+                {
+                    edges = new HashSet<E>();
+                    Parents.Add(vertex, edges);
+                }
+                if (replace)
+                {
+                    edges.Clear();
+                }
+                if (MaxPaths == AllPaths || edges.Count < MaxPaths)
+                {
+                    edges.Add(edge);
                 }
             }
 
@@ -157,7 +158,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
                 if (Dst == null)
                 {
-                    foreach (var cost in Costs.Keys)
+                    foreach (V cost in Costs.Keys)
                     {
                         destinations.Add(cost);
                     }
@@ -198,7 +199,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 var frontier = new HashSet<DefaultMutablePath<V, E>>();
 
-                foreach (var path in pendingPaths)
+                foreach (DefaultMutablePath<V, E> path in pendingPaths)
                 {
                     // For each pending path, locate its first vertex
                     // since we will be moving backwards from it.
@@ -216,7 +217,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                         // If we have not reached the beginning, i.e. the source, fetch the 
                         // set of edges leading to the first vertex of this pending path.
                         // If there are none, abandon processing this path for good.
-                        var firstVertexParents = result.Parents.GetOrDefault(firstVertex, new HashSet<E>());
+                        ISet<E> firstVertexParents = result.Parents.GetOrDefault(firstVertex, new HashSet<E>());
                         if (firstVertex is null || firstVertexParents?.Count == 0)
                         {
                             break;
@@ -232,12 +233,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                             E edge = edges[i];
                             bool isLast = i == edges.Count - 1;
                             // Exclude any looping paths.
-                            if (!IsInPath(edge, path))
+                            if (IsInPath(edge, path))
                             {
-                                var pendingPath = isLast ? path : new DefaultMutablePath<V, E>();
-                                pendingPath.InsertEdge(edge);
-                                frontier.Add(pendingPath);
+                                continue;
                             }
+                            DefaultMutablePath<V, E> pendingPath = isLast ? path : new DefaultMutablePath<V, E>();
+                            pendingPath.InsertEdge(edge);
+                            frontier.Add(pendingPath);
                         }
                     }
                 }
@@ -274,7 +276,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             CheckNotNull(graph, "The graph cannot be null.");
             CheckNotNull(src, "The source vertex cannot be null.");
-            var vertices = graph.Vertices;
+            ISet<V> vertices = graph.Vertices;
             CheckArgument(vertices.Contains(src), "Source is not in the graph.");
             CheckArgument(dst is null || vertices.Contains(dst), "Destination is not in the graph.");
         }

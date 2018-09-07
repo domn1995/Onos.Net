@@ -151,7 +151,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// <param name="data">The vertex to add a new cluster for.</param>
             internal void AddCluster(VertexData data)
             {
-                var vertices = FindClusterVertices(data);
+                ISet<V> vertices = FindClusterVertices(data);
                 clusterVertices.Add(vertices);
                 clusterEdges.Add(FindClusterEdges(vertices));
             }

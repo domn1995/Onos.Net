@@ -26,13 +26,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             CheckArgument(maxPaths != AllPaths, "KShortestPath cannot search all paths.");
             CheckArgument(maxPaths > 0, "The max number of paths must be greater than 0.");
 
-            var originalGraph = CheckNotNull(graph, "The graph cannot be null.");
+            IGraph<V, E> originalGraph = CheckNotNull(graph, "The graph cannot be null.");
             var modifiedWeigher = new InnerEdgeWeigher(weigher);
             var result = new InnerOrderedResult(src, dst, maxPaths);
             var resultPaths = new List<IPath<V, E>>(maxPaths);
             var potentialPaths = new List<IPath<V, E>>();
             var dijkstraSearch = new DijkstraGraphSearch<V, E>();
-            var dijkstraResults = dijkstraSearch.Search(originalGraph, src, dst, modifiedWeigher, 1).Paths;
+            ISet<IPath<V, E>> dijkstraResults = dijkstraSearch.Search(originalGraph, src, dst, modifiedWeigher, 1).Paths;
 
             // Checks if the destination was reachable.
             if (dijkstraResults.Count == 0)
@@ -49,9 +49,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 for (int i = 0; i < resultPaths[k - 1].Edges.Count; ++ i)
                 {
                     V spurNode = resultPaths[k - 1].Edges[i].Src;
-                    var rootPathEdgeList = resultPaths[k - 1].Edges.Take(i).ToList();
+                    List<E> rootPathEdgeList = resultPaths[k - 1].Edges.Take(i).ToList();
 
-                    foreach (var path in resultPaths)
+                    foreach (IPath<V, E> path in resultPaths)
                     {
                         if (path.Edges.Count >= i && rootPathEdgeList.SequenceEqual(path.Edges.Take(i)))
                         {
@@ -62,11 +62,11 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                     // Effectively remove all nodes from the source path.
                     foreach (E edge in rootPathEdgeList)
                     {
-                        foreach (var e in originalGraph.GetEdgesFrom(edge.Src))
+                        foreach (E e in originalGraph.GetEdgesFrom(edge.Src))
                         {
                             modifiedWeigher.RemovedEdges.Add(e);
                         }
-                        foreach (var e in originalGraph.GetEdgesTo(edge.Src))
+                        foreach (E e in originalGraph.GetEdgesTo(edge.Src))
                         {
                             modifiedWeigher.RemovedEdges.Add(e);
                         }
@@ -76,7 +76,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
                     if (dijkstraResults.Count > 0)
                     {
-                        var spurPath = dijkstraResults.First();
+                        IPath<V, E> spurPath = dijkstraResults.First();
                         var totalPath = new List<E>(rootPathEdgeList);
                         foreach (E edge in spurPath.Edges)
                         {
@@ -116,7 +116,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             IWeight totalCost = weigher.InitialWeight;
 
-            foreach (var edge in edges)
+            foreach (E edge in edges)
             {
                 totalCost = totalCost.Merge(weigher.GetWeight(edge));
             }

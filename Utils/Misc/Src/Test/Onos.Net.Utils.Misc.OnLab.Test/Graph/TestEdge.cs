@@ -1,9 +1,7 @@
-﻿using Onos.Net.Utils.Misc.OnLab.Graph;
-using Onos.Net.Utils.Misc.OnLab.Test.Graph;
-using System;
-using static Onos.Net.Utils.Misc.OnLab.Test.Graph.GraphTest;
+﻿using System;
+using Onos.Net.Utils.Misc.OnLab.Graph;
 
-namespace Onos.Net.Utils.Misc.OnLab.Test
+namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 {
     /// <summary>
     /// Represents a test edge.
@@ -31,20 +29,16 @@ namespace Onos.Net.Utils.Misc.OnLab.Test
         /// </summary>
         /// <param name="src">The source vertex.</param>
         /// <param name="dst">The destination vertex.</param>
-        public TestEdge(TestVertex src, TestVertex dst) : this(src, dst, W1)
+        public TestEdge(TestVertex src, TestVertex dst) : this(src, dst, GraphTest.W1)
         {
 
         }
-
-        public static bool operator ==(TestEdge first, TestEdge second) => first.Equals(second);
-
-        public static bool operator !=(TestEdge first, TestEdge second) => !(first == second);
 
         public override bool Equals(object obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is TestEdge e ? IsEqual(e) : false;
+            return obj is TestEdge e && IsEqual(e);
         }
 
         public bool Equals(TestEdge other)
@@ -54,7 +48,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test
             return IsEqual(other);
         }
 
-        protected virtual bool IsEqual(TestEdge other) => base.Equals(other) && Weight == other.Weight;
+        protected virtual bool IsEqual(TestEdge other) => base.Equals(other) && Weight.Equals(other.Weight);
 
         public override int GetHashCode() => 31 ^ base.GetHashCode() + HashCode.Combine(Weight);
 

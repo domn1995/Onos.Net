@@ -40,19 +40,19 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
             DisjointPathResult result = new DisjointPathResult(firstDijkstra, src, dst, maxPaths);
 
-            foreach (var p in firstDijkstraS.Paths)
+            foreach (IPath<V, E> p in firstDijkstraS.Paths)
             {
                 shortPath = p;
                 // Transforms the graph so tree edges have 0 weight.
                 var modified = new ModifiedWeigher(this);
                 // Create a residual graph g' by removing all source vertices and reversing 0 length path edges.
-                var gt = MutableCopy(graph);
+                IMutableGraph<V, E> gt = MutableCopy(graph);
                 var revToEdge = new Dictionary<E, E>();
-                foreach (var edge in graph.GetEdgesTo(src))
+                foreach (E edge in graph.GetEdgesTo(src))
                 {
                     gt.RemoveEdge(edge);
                 }
-                foreach (var edge in shortPath.Edges)
+                foreach (E edge in shortPath.Edges)
                 {
                     gt.RemoveEdge(edge);
                     IEdge<V> reverse = new ReverseEdge(edge);
@@ -60,28 +60,27 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                     gt.AddEdge((E)reverse);
                 }
                 // Rerun dijkstra on the temporary graph to get a second path.
-                var secondDijkstra = new DijkstraGraphSearch<V, E>().Search(gt, src, dst, modified, AllPaths);
-                IPath<V, E> residualShortPath = null;
+                IResult<V, E> secondDijkstra = new DijkstraGraphSearch<V, E>().Search(gt, src, dst, modified, AllPaths);
                 if (secondDijkstra.Paths.Count == 0)
                 {
                     result.Dpps.Add(new DisjointPathPair<V, E>(shortPath, null));
                     continue;
                 }
 
-                foreach (var p2 in secondDijkstra.Paths)
+                foreach (IPath<V, E> p2 in secondDijkstra.Paths)
                 {
-                    residualShortPath = p2;
-                    var roundTrip = MutableCopy(graph);
-                    var tmp = roundTrip.Edges.ToList();
+                    IPath<V, E> residualShortPath = p2;
+                    IMutableGraph<V, E> roundTrip = MutableCopy(graph);
+                    List<E> tmp = roundTrip.Edges.ToList();
                     tmp.ForEach(roundTrip.RemoveEdge);
-                    foreach (var edge in shortPath.Edges)
+                    foreach (E edge in shortPath.Edges)
                     {
                         roundTrip.AddEdge(edge);
                     }
 
                     if (residualShortPath != null)
                     {
-                        foreach (var edge in residualShortPath.Edges)
+                        foreach (E edge in residualShortPath.Edges)
                         {
                             if (edge is ReverseEdge)
                             {
@@ -96,17 +95,17 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
                     // Actually build the final result.
                     DefaultResult lastSearch = (DefaultResult)base.InternalSearch(roundTrip, src, dst, weigher, AllPaths);
-                    var primary = lastSearch.Paths.First();
+                    IPath<V, E> primary = lastSearch.Paths.First();
                     
-                    foreach (var edge in primary.Edges)
+                    foreach (E edge in primary.Edges)
                     {
                         roundTrip.RemoveEdge(edge);
                     }
 
-                    var backups = base.InternalSearch(roundTrip, src, dst, weigher, AllPaths).Paths;
+                    ISet<IPath<V, E>> backups = base.InternalSearch(roundTrip, src, dst, weigher, AllPaths).Paths;
 
                     // Find first backup path that does not share any nodes with the primary.
-                    foreach (var backup in backups)
+                    foreach (IPath<V, E> backup in backups)
                     {
                         if (IsDisjoint(primary, backup))
                         {
@@ -116,8 +115,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                     }
                 }
             }
-
-            // TODO: LINQify.
             for (int i = result.Dpps.Count - 1; i > 0; --i)
             {
                 if (result.Dpps[i].Size <= 1)
@@ -130,22 +127,22 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             return result;
         }
 
-        private bool IsDisjoint(IPath<V, E> a, IPath<V, E> b) => Vertices(a).Intersect(Vertices(b)).Count() == 0;
+        private static bool IsDisjoint(IPath<V, E> a, IPath<V, E> b) => !Vertices(a).Intersect(Vertices(b)).Any();
 
         /// <summary>
         /// Creates a mutable copy of an immutable graph.
         /// </summary>
         /// <param name="graph">The graph to copy.</param>
         /// <returns>A mutable copy of the given graph.</returns>
-        private IMutableGraph<V, E> MutableCopy(IGraph<V, E> graph)
+        private static IMutableGraph<V, E> MutableCopy(IGraph<V, E> graph)
         {
             return new MutableAdjacencyListsGraph<V, E>(graph.Vertices, graph.Edges);
         }
 
-        private ISet<V> Vertices(IPath<V, E> p)
+        private static IEnumerable<V> Vertices(IPath<V, E> p)
         {
             ISet<V> set = new HashSet<V>();
-            foreach (var edge in p.Edges)
+            foreach (E edge in p.Edges)
             {
                 set.Add(edge.Src);
             }
@@ -199,31 +196,32 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         private sealed class DisjointPathResult : DefaultResult
         {
             private readonly IResult<V, E> searchResult;
-            private readonly V src, dst;
             private readonly int maxPaths;
             public IList<DisjointPathPair<V, E>> Dpps { get; } = new List<DisjointPathPair<V, E>>();
-            private readonly ISet<IPath<V, E>> disjointPaths = new HashSet<IPath<V, E>>();
 
-            public override V Src => src;
-            public override V Dst => dst;
-            public override ISet<IPath<V, E>> Paths => disjointPaths;
+            public override V Src { get; }
+
+            public override V Dst { get; }
+
+            public override ISet<IPath<V, E>> Paths { get; } = new HashSet<IPath<V, E>>();
+
             public override IDictionary<V, ISet<E>> Parents => searchResult.Parents;
             public override IDictionary<V, IWeight> Costs => searchResult.Costs;
 
             public DisjointPathResult(IResult<V, E> searchResult, V src, V dst, int maxPaths = -1) : base(src, dst, maxPaths)
             {
                 this.searchResult = searchResult;
-                this.src = src;
-                this.dst = dst;
+                Src = src;
+                Dst = dst;
                 this.maxPaths = maxPaths;
             }
 
             public new void BuildPaths()
             {
                 int paths = 0;
-                foreach (var path in Dpps)
+                foreach (DisjointPathPair<V, E> path in Dpps)
                 {
-                    disjointPaths.Add(path);
+                    Paths.Add(path);
                     paths++;
                     if (paths == maxPaths)
                     {

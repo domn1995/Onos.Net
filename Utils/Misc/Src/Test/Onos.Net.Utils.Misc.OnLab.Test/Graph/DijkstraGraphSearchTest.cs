@@ -28,8 +28,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void NoPath()
         {
-            var set1 = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
-            var set2 = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> set1 = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> set2 = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B, W1),
                 new TestEdge(B, A, W1),
@@ -38,8 +38,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             }.ToImmutableHashSet();
 
             Graph = new TestAdjacencyListsGraph(set1, set2);
-            var gs = GraphSearch;
-            var paths = gs.Search(Graph, A, B, Weigher, 1).Paths;
+            TestAbstractGraphPathSearch gs = GraphSearch;
+            ISet<IPath<TestVertex, TestEdge>> paths = gs.Search(Graph, A, B, Weigher, 1).Paths;
             PrintPaths(paths);
             Assert.Equal(1, paths.Count);
             Assert.Equal(new TestDoubleWeight(1.0), paths.First().Cost);
@@ -57,8 +57,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void Exceptions()
         {
-            var set1 = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
-            var set2 = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> set1 = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> set2 = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B, W2),
                 new TestEdge(B, A, W1),
@@ -67,8 +67,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                 new TestEdge(C, D, W3),
             }.ToImmutableHashSet();
             Graph = new TestAdjacencyListsGraph(set1, set2);
-            var gs = GraphSearch;
-            var paths = gs.Search(Graph, A, D, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
+            TestAbstractGraphPathSearch gs = GraphSearch;
+            ISet<IPath<TestVertex, TestEdge>> paths = gs.Search(Graph, A, D, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
             PrintPaths(paths);
             Assert.Equal(0, paths.Count);
 
@@ -92,8 +92,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void SimpleMultiplePath()
         {
-            var set1 = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
-            var set2 = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> set1 = new HashSet<TestVertex>() { A, B, C, D }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> set2 = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B, W1),
                 new TestEdge(A, C, W1),
@@ -114,8 +114,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void ManualDoubleWeights()
         {
-            var set1 = new HashSet<TestVertex>() { A, B, C, D, E }.ToImmutableHashSet();
-            var set2 = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> set1 = new HashSet<TestVertex>() { A, B, C, D, E }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> set2 = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B, new TestDoubleWeight(1.5)),
                 new TestEdge(B, D, new TestDoubleWeight(3.5)),
@@ -132,8 +132,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void DenseMultiplePath()
         {
-            var set1 = new HashSet<TestVertex>() { A, B, C, D, E, F, G }.ToImmutableHashSet();
-            var set2 = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> set1 = new HashSet<TestVertex>() { A, B, C, D, E, F, G }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> set2 = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B, W1),
                 new TestEdge(A, C, W1),
@@ -153,8 +153,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void DualEdgeMultiplePath()
         {
-            var set1 = new HashSet<TestVertex>() { A, B, C, D, E, F, G, H }.ToImmutableHashSet();
-            var set2 = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> set1 = new HashSet<TestVertex>() { A, B, C, D, E, F, G, H }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> set2 = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B, W1),
                 new TestEdge(A, C, W3),
@@ -175,9 +175,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             ExecuteSearch(GraphSearch, Graph, A, E, Weigher, 3, W3);
             ExecuteSinglePathSearch(GraphSearch, Graph, A, E, Weigher, 1, W3);
 
-            var gs = GraphSearch;
-            var pathF = gs.Search(Graph, A, F, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
-            var pathE = gs.Search(Graph, A, E, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
+            TestAbstractGraphPathSearch gs = GraphSearch;
+            ISet<IPath<TestVertex, TestEdge>> pathF = gs.Search(Graph, A, F, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
+            ISet<IPath<TestVertex, TestEdge>> pathE = gs.Search(Graph, A, E, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
             Assert.Equal(0, pathF.Count - pathE.Count);
             Assert.Equal(new TestDoubleWeight(1.0), pathF.First().Cost.Subtract(pathE.First().Cost));
         }
@@ -185,8 +185,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         [Fact]
         public void NegativeWeights()
         {
-            var set1 = new HashSet<TestVertex>() { A, B, C, D, E, F, G }.ToImmutableHashSet();
-            var set2 = new HashSet<TestEdge>()
+            ImmutableHashSet<TestVertex> set1 = new HashSet<TestVertex>() { A, B, C, D, E, F, G }.ToImmutableHashSet();
+            ImmutableHashSet<TestEdge> set2 = new HashSet<TestEdge>()
             {
                 new TestEdge(A, B, W1),
                 new TestEdge(A, C, NW1),
@@ -216,11 +216,11 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
 
             Graph = new TestAdjacencyListsGraph(vertices, new HashSet<TestEdge>().ToImmutableHashSet());
             Stopwatch sw = Stopwatch.StartNew();
-            foreach (var src in vertices)
+            foreach (TestVertex src in vertices)
             {
                 ExecuteSearch(GraphSearch, Graph, src, null, null, 0, new TestDoubleWeight(0));
             }
-            var elapsed = sw.ElapsedTicks;
+            long elapsed = sw.ElapsedTicks;
             Console.WriteLine($"Compute cost is {elapsed}");
         }
     }
