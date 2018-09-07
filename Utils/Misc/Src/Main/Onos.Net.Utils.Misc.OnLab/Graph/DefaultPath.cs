@@ -74,9 +74,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             bool result = Src.Equals(other.Src) &&
                    Dst.Equals(other.Dst) &&
-                   edges.SequenceEqual(other.Edges) &&
+                   edges.SequenceEqual(other.edges) &&
                    // TODO: This is clunky, is there a better way?
-                   other.Cost is null ? Cost is null : other.Cost.Equals(Cost);
+                   (other.Cost?.Equals(Cost) ?? Cost is null);
             return result;
         }
 

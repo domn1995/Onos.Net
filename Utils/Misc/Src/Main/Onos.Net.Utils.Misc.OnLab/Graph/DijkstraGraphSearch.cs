@@ -19,9 +19,9 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             var result = new DefaultResult(src, dst, maxPaths);
 
             // Cost to reach the source vertex is 0, of course.
-            result.UpdateVertex(src, default, weigher.InitialWeight, false);
+            result.UpdateVertex(src, null, weigher.InitialWeight, false);
 
-            if (graph.Edges.Count == 0)
+            if (graph.Edges.Count is 0)
             {
                 result.BuildPaths();
                 return result;
@@ -66,7 +66,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// Compares path weights using their accrued costs.
         /// Used for sorting the min priority queue.
         /// </summary>
-        private class PathCostComparer : IComparer<V>
+        private sealed class PathCostComparer : IComparer<V>
         {
             private readonly DefaultResult result;
 

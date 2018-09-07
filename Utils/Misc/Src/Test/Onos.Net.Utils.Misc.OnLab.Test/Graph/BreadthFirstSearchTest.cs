@@ -30,14 +30,14 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
         {
             Graph = new TestAdjacencyListsGraph(Vertices, Edges);
             IGraphPathSearch<TestVertex, TestEdge> search = GraphSearch;
-            ISet<IPath<TestVertex, TestEdge>> paths = search.Search(Graph, A, H, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
+            ISet<IPath<TestVertex, TestEdge>> paths = search.Search(Graph, A, H, Weigher).Paths;
             Assert.Equal(1, paths.Count);
             IPath<TestVertex, TestEdge> p = paths.First();
             Assert.Equal(A, p.Src);
             Assert.Equal(H, p.Dst);
             Assert.Equal(pathLength, p.Edges.Count);
             Assert.Equal(pathCost, p.Cost);
-            paths = search.Search(Graph, A, null, Weigher, TestAbstractGraphPathSearch.AllPaths).Paths;
+            paths = search.Search(Graph, A, null, Weigher).Paths;
             PrintPaths(paths);
             Assert.Equal(pathCount, paths.Count);
         }
@@ -46,7 +46,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
             IGraph<TestVertex, TestEdge> graph, TestVertex src, TestVertex dst,
             IEdgeWeigher<TestVertex, TestEdge> weigher, int pathCount, IWeight pathCost)
         {
-            IResult<TestVertex, TestEdge> result = search.Search(graph, src, dst, weigher, TestAbstractGraphPathSearch.AllPaths);
+            IResult<TestVertex, TestEdge> result = search.Search(graph, src, dst, weigher);
             ISet<IPath<TestVertex, TestEdge>> paths = result.Paths;
             PrintPaths(paths);
             Assert.Equal(pathCount, paths.Count);

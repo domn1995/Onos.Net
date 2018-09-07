@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection.Metadata.Ecma335;
+using Onos.Net.Utils.Misc.OnLab.Helpers;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
@@ -49,6 +50,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 return 0;
             }
+
             return Value.CompareTo(((ScalarWeight)otherWeight).Value);
         }
 
@@ -73,11 +75,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             return IsEqual(other);
         }
 
-        public virtual bool IsEqual(IWeight other)
-        {
-            return Math.Abs(other.Value - Value) < SamenessTreshold;
-        }
-
+        public virtual bool IsEqual(IWeight other) => other.Value.FuzzyEquals(Value, SamenessTreshold);
+   
         /// <inheritdoc/>
         public override int GetHashCode()
         {

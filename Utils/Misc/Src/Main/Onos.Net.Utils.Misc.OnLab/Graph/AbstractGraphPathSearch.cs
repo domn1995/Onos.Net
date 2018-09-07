@@ -207,7 +207,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
                     // If the first vertex is our expected source, we have reached
                     // the beginning, so add this path to the result paths.
-                    if (firstVertex == src)
+                    if (firstVertex.Equals(src))
                     {
                         path.Cost = result.GetCost(dst);
                         result.Paths.Add(new DefaultPath<V, E>(path.Edges, path.Cost));
@@ -218,7 +218,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                         // set of edges leading to the first vertex of this pending path.
                         // If there are none, abandon processing this path for good.
                         ISet<E> firstVertexParents = result.Parents.GetOrDefault(firstVertex, new HashSet<E>());
-                        if (firstVertex is null || firstVertexParents?.Count == 0)
+                        if (firstVertexParents is null || firstVertexParents?.Count is 0)
                         {
                             break;
                         }
@@ -233,13 +233,12 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                             E edge = edges[i];
                             bool isLast = i == edges.Count - 1;
                             // Exclude any looping paths.
-                            if (IsInPath(edge, path))
+                            if (!IsInPath(edge, path))
                             {
-                                continue;
+                                DefaultMutablePath<V, E> pendingPath = isLast ? path : new DefaultMutablePath<V, E>(path);
+                                pendingPath.InsertEdge(edge);
+                                frontier.Add(pendingPath);
                             }
-                            DefaultMutablePath<V, E> pendingPath = isLast ? path : new DefaultMutablePath<V, E>();
-                            pendingPath.InsertEdge(edge);
-                            frontier.Add(pendingPath);
                         }
                     }
                 }
@@ -256,7 +255,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="path">The path to search.</param>
         /// <param name="dst">The destination to search.</param>
         /// <returns>The first vertex found, otherwise returns the given destination vertex.</returns>
-        private static V GetFirstVertex(IPath<V, E> path, V dst) => path.Edges.Count == 0 ? dst : path.Edges[0].Src;
+        private static V GetFirstVertex(IPath<V, E> path, V dst) => path.Edges.Count is 0 ? dst : path.Edges[0].Src;
 
         /// <summary>
         /// Determines whether or not the specified edge source is already visited in the specified path.
@@ -264,7 +263,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="edge">The edge to test.</param>
         /// <param name="path">The path to test.</param>
         /// <returns>True if the edge's source is a vertex in the path already.</returns>
-        private static bool IsInPath(E edge, DefaultMutablePath<V, E> path) => path.Edges.Any(e => e.Src == e.Dst);
+        private static bool IsInPath(E edge, DefaultMutablePath<V, E> path) => path.Edges.Any(e => e.Src.Equals(e.Dst));
 
         /// <summary>
         /// Checks the specified path search arguments for validity.
