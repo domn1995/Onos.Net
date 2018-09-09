@@ -58,12 +58,11 @@ namespace Onos.Net.Utils.Misc.OnLab.Test.Graph
                     new TestEdge(F, D, W1),
                     new TestEdge(F, G, W1),
                     new TestEdge(F, H, W1),
-                }
-                .ToImmutableHashSet();
+                }.ToImmutableHashSet();
             }
         }
 
-        protected void PrintPaths(ISet<IPath<TestVertex, TestEdge>> paths)
+        protected static void PrintPaths(IEnumerable<IPath<TestVertex, TestEdge>> paths)
         {
             foreach (IPath<TestVertex, TestEdge> p in paths)
             {

@@ -78,11 +78,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode()
-        {
-            int code = HasBackup ? Primary.GetHashCode() + Secondary.GetHashCode() : Primary.GetHashCode();
-            return code;
-        }
+        public override int GetHashCode() => HasBackup ? Primary.GetHashCode() + Secondary.GetHashCode() : Primary.GetHashCode();
 
         /// <inheritdoc/>
         public override string ToString() => $"[{GetType().Name}] Src = {Src}, Dst = {Dst}, Cost = {Cost}, Edges = {Edges}";

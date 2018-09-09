@@ -154,7 +154,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
             public IWeight NonViableWeight => weigher.NonViableWeight;
 
-            // TODO: Erroniosly returning non viable.
             public IWeight GetWeight(E edge)
             {
                 if (subsetF[riskGrouping[edge]])

@@ -91,8 +91,8 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         {
             private readonly IGraph<V, E> graph;
             private int index = 0;
-            private IList<ISet<V>> clusterVertices = new List<ISet<V>>();
-            private IList<ISet<E>> clusterEdges = new List<ISet<E>>();
+            private readonly IList<ISet<V>> clusterVertices = new List<ISet<V>>();
+            private readonly IList<ISet<E>> clusterEdges = new List<ISet<E>>();
             private readonly Dictionary<V, VertexData> vertexData = new Dictionary<V, VertexData>();
             private readonly List<VertexData> visited = new List<VertexData>();
 

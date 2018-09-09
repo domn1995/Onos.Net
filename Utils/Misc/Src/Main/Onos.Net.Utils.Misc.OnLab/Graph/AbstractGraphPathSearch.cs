@@ -84,7 +84,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             /// False to indicate that the edge should be added to the previously accrued edges as they yield the same cost.</param>
             public void UpdateVertex(V vertex, E edge, IWeight cost, bool replace)
             {
-                Costs.SetOrAdd(vertex, cost);
+                Costs.AddOrSet(vertex, cost);
 
                 if (edge is null)
                 {
@@ -92,7 +92,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 }
 
                 ISet<E> edges = Parents.GetOrDefault(vertex);
-                if (edges == null)
+                if (edges is null)
                 {
                     edges = new HashSet<E>();
                     Parents.Add(vertex, edges);
@@ -156,7 +156,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
             {
                 var destinations = new HashSet<V>();
 
-                if (Dst == null)
+                if (Dst is null)
                 {
                     foreach (V cost in Costs.Keys)
                     {
@@ -170,7 +170,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
                 foreach (V v in destinations)
                 {
-                    if (v != Src)
+                    if (!v.Equals(Src))
                     {
                         BuildAllPaths(this, Src, v, MaxPaths);
                     }
@@ -263,7 +263,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         /// <param name="edge">The edge to test.</param>
         /// <param name="path">The path to test.</param>
         /// <returns>True if the edge's source is a vertex in the path already.</returns>
-        private static bool IsInPath(E edge, DefaultMutablePath<V, E> path) => path.Edges.Any(e => edge.Src.Equals(e.Dst));
+        private static bool IsInPath(E edge, IPath<V, E> path) => path.Edges.Any(e => edge.Src.Equals(e.Dst));
 
         /// <summary>
         /// Checks the specified path search arguments for validity.
@@ -292,7 +292,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         protected abstract IResult<V, E> InternalSearch(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = AllPaths);
 
         /// <inheritdoc/>
-        public IResult<V, E> Search(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = -1)
+        public IResult<V, E> Search(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = AllPaths)
         {
             CheckArguments(graph, src, dst);
             return InternalSearch(graph, src, dst, weigher ?? new DefaultEdgeWeigher<V, E>(), maxPaths);

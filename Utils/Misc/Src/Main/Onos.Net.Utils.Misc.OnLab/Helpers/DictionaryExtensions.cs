@@ -4,7 +4,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Helpers
 {
     public static class DictionaryExtensions
     {
-        public static void SetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value)
+        public static void AddOrSet<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value)
         {
             if (dict.ContainsKey(key))
             {

@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Onos.Net.Utils.Misc.OnLab.Helpers;
 
 namespace Onos.Net.Utils.Misc.OnLab.Graph
 {
     /// <summary>
     /// Suurablle shortest-path graph search algorithm capable of finding 
-    /// both a shortest path,/// as well as a backup shortest path, between 
+    /// both a shortest path, as well as a backup shortest path, between 
     /// a source and destination such that the sum of the path lengths is minimized.
     /// </summary>
     /// <typeparam name="V">The vertex type.</typeparam>
@@ -17,6 +19,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
         private IEdgeWeigher<V, E> weightF;
         private DefaultResult firstDijkstraS;
         private DefaultResult firstDijkstra;
+        private Dictionary<E, E> revToEdge = new Dictionary<E, E>();
 
         /// <inheritdoc/>
         protected override IResult<V, E> InternalSearch(IGraph<V, E> graph, V src, V dst, IEdgeWeigher<V, E> weigher, int maxPaths = -1)
@@ -49,7 +52,6 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 var modified = new ModifiedWeigher(this);
                 // Create a residual graph g' by removing all source vertices and reversing 0 length path edges.
                 IMutableGraph<V, E> gt = MutableCopy(graph);
-                var revToEdge = new Dictionary<E, E>();
                 foreach (E edge in graph.GetEdgesTo(src))
                 {
                     gt.RemoveEdge(edge);
@@ -58,11 +60,13 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 {
                     gt.RemoveEdge(edge);
                     E reverse = (E)Activator.CreateInstance(typeof(E), edge.Dst, edge.Src);
-                    revToEdge.Add(reverse, edge);
+                    revToEdge.AddOrSet(reverse, edge);
                     gt.AddEdge(reverse);
                 }
                 // Rerun dijkstra on the temporary graph to get a second path.
                 IResult<V, E> secondDijkstra = new DijkstraGraphSearch<V, E>().Search(gt, src, dst, modified);
+                IPath<V, E> residualShortPath = null;
+
                 if (secondDijkstra.Paths.Count == 0)
                 {
                     result.Dpps.Add(new DisjointPathPair<V, E>(shortPath, null));
@@ -71,7 +75,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
                 foreach (IPath<V, E> p2 in secondDijkstra.Paths)
                 {
-                    IPath<V, E> residualShortPath = p2;
+                    residualShortPath = p2;
                     IMutableGraph<V, E> roundTrip = MutableCopy(graph);
                     List<E> tmp = roundTrip.Edges.ToList();
                     tmp.ForEach(roundTrip.RemoveEdge);
@@ -86,9 +90,10 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                         {
                             if (revToEdge.ContainsKey(edge))
                             {
-                                if (roundTrip.Edges.Contains(edge))
+                                E edgeToRemove = revToEdge[edge];
+                                if (roundTrip.Edges.Contains(edgeToRemove))
                                 {
-                                    roundTrip.RemoveEdge(revToEdge[edge]);
+                                    roundTrip.RemoveEdge(edgeToRemove);
                                 }
                             }
                             else
@@ -120,6 +125,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                     }
                 }
             }
+
             for (int i = result.Dpps.Count - 1; i > 0; --i)
             {
                 if (result.Dpps[i].Size <= 1)
@@ -169,7 +175,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
 
             public IWeight GetWeight(E edge)
             {
-                if (edge is ReverseEdge)
+                if (search.revToEdge.ContainsKey(edge))
                 {
                     return search.weightF.InitialWeight;
                 }
@@ -179,22 +185,12 @@ namespace Onos.Net.Utils.Misc.OnLab.Graph
                 }
                 else
                 {
-                    return search.weightF.GetWeight(edge).Merge(search.firstDijkstra.GetCost(edge.Src)
-                        .Subtract(search.firstDijkstra.GetCost(edge.Dst)));
+                    return search.weightF.GetWeight(edge).Merge(search.firstDijkstra.GetCost(edge.Src))
+                        .Subtract(search.firstDijkstra.GetCost(edge.Dst));
                 }
             }
         }
-
-        private sealed class ReverseEdge : AbstractEdge<V> 
-        {
-            public ReverseEdge(IEdge<V> edge) : base(edge.Src, edge.Dst)
-            {
-
-            }
-
-            public override string ToString() => $"ReversedEdge Src={Src} Dst={Dst}";
-        }
-
+        
         /// <summary>
         /// Auxiliary result for disjoint path search.
         /// </summary>
