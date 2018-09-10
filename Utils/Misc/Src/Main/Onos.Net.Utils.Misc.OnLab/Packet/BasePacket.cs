@@ -26,7 +26,7 @@ namespace Onos.Net.Utils.Misc.OnLab.Packet
         {
             const int prime = 6733;
             int result = 1;
-            result = prime * result + (Payload is null ? 0 : Payload.GetHashCode());
+            result = prime * result + (Payload?.GetHashCode() ?? 0);
             return result;
         }
 
